@@ -4,10 +4,12 @@
 ** bronze
 *** assunto_python
 **** lista_id_canal_id_video.pkl
+
 **** req_pesquisa
 ***** extracao_data_2024_10_20_14_31_00
 ****** req_busca_historico_pesquisa.json
 **** dados_canais
+***** lista_id_canal_geral.pkl
 ***** id_canais_br.pkl
 ***** extracao_data_2024_10_20_14_31_00
 ****** req_est_dados_canais.json
@@ -17,6 +19,7 @@
 ****** req_est_videos.json
 
 ** prata 
+*** database
 ** ouro
 
 
