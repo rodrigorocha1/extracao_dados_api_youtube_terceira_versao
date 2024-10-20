@@ -1,0 +1,24 @@
+@@startmindmap
+
+* datalake_youtube
+** bronze
+*** assunto_python
+**** lista_id_canal_id_video.pkl
+**** req_pesquisa
+***** extracao_data_2024_10_20_14_31_00
+****** req_busca_historico_pesquisa.json
+**** dados_canais
+***** id_canais_br.pkl
+***** extracao_data_2024_10_20_14_31_00
+****** req_est_dados_canais.json
+**** dados_videos
+***** id_videos.pkl
+***** extracao_data_2024_10_20_14_31_00
+****** req_est_videos.json
+
+** prata 
+** ouro
+
+
+
+@@endmindmap
