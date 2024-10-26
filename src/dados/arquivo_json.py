@@ -1,10 +1,12 @@
 import json
 from src.dados.arquivo import Arquivo
 from typing import Dict
+import os
 
 
 class ArquivoJson(Arquivo[Dict]):
-    def __init__(self, pasta_datalake, camada_datalake, assunto, metrica, nome_arquivo):
+
+    def __init__(self, pasta_datalake, camada_datalake, assunto, nome_arquivo, metrica=None):
         """_summary_
 
         Args:
@@ -14,11 +16,18 @@ class ArquivoJson(Arquivo[Dict]):
             nome_arquivo (str): métrica de pesquisa
             metrica (str, optional): o nome do arquivo. Defaults to None.
         """
-        super().__init__(pasta_datalake, camada_datalake, assunto, metrica, nome_arquivo)
-        if self.__metrica is
+        super().__init__(pasta_datalake, camada_datalake, assunto, nome_arquivo, metrica)
 
-    def salvar_dados(self):
-        return super().salvar_dados()
+    def salvar_dados(self, dados: Dict):
+        """Método para guardar json
+        """
+
+        if not os.path.exists(self._diretorio_completo):
+            os.makedirs(self._diretorio_completo, exist_ok=True)
+
+        with open(os.path.join(self._diretorio_completo, self._nome_arquivo), 'a') as arquivo_json:
+            json.dump(dados,  arquivo_json, ensure_ascii=False)
+            arquivo_json.write('\n')
 
     def carregar_dados(self):
-        return super().carregar_dados()
+        pass

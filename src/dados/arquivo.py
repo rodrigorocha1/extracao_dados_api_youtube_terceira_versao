@@ -1,5 +1,5 @@
 
-from typing import Generic, TypeVar
+from typing import Generic, Optional, TypeVar
 from src.dados.ioperacoes_dados import IoperacaoDados
 from abc import abstractmethod
 import os
@@ -7,16 +7,16 @@ import os
 T = TypeVar('T')
 
 
-class Arquivo(IoperacaoDados, Generic[T]):
-    def __init__(self, pasta_datalake: str, camada_datalake: str, assunto: str,  nome_arquivo: str, metrica: str = None):
+class Arquivo(IoperacaoDados[T], Generic[T]):
+    def __init__(self, pasta_datalake: str, camada_datalake: str, assunto: str, nome_arquivo: str, metrica: Optional[str] = None):
         """_summary_
 
         Args:
             pasta_datalake (str): o nome raíz do datalake
             camada_datalake (str): a camada do datalake, bronze, prata, ouro
             assunto (str): é o assunto de pesquisa
-            nome_arquivo (str): métrica de pesquisa
-            metrica (str, optional): o nome do arquivo. Defaults to None.
+            nome_arquivo (str): o nome do arquivo
+            metrica (Optional[str], optional): o nome da métrica. Defaults to None.
         """
 
         self._caminho_base = os.getcwd()
@@ -25,6 +25,7 @@ class Arquivo(IoperacaoDados, Generic[T]):
         self._assunto = assunto
         self._metrica = metrica
         self._nome_arquivo = nome_arquivo
+
         if self._metrica is not None:
             self._diretorio_completo = os.path.join(
                 self._caminho_base,
@@ -42,7 +43,7 @@ class Arquivo(IoperacaoDados, Generic[T]):
             )
 
     @abstractmethod
-    def salvar_dados(self) -> None:
+    def salvar_dados(self, dados: T):
         pass
 
     @abstractmethod
