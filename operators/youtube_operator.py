@@ -7,8 +7,8 @@ from typing import Dict
 
 class YoutubeOperator(BaseOperator, ABC):
     def __init__(self, **kwargs):
-        self.__operacao_dados = IoperacaoDados()
-        self.__operacao_hook = YotubeHook()
+        self._operacao_dados = IoperacaoDados()
+        self._operacao_hook = YotubeHook()
         super().__init__(**kwargs)
 
     @abstractmethod
