@@ -24,8 +24,7 @@ class YoutubeBuscaAssuntoHook(YotubeHook):
         page_token = ''
         while flag_paginacao:
 
-            response = self.conectar_api(
-                assunto='Transport Fever 2', pageToken=page_token)
+            response = self.conectar_api(pageToken=page_token)
             print(type(response))
             yield response
 
