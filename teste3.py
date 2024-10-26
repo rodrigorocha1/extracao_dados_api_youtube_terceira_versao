@@ -1,3 +1,11 @@
-a = [(1, 2), (1, 2), (1, 3)]
+def somar(**kwargs):
+    a = kwargs['a']
+    b = kwargs['b']
+    print(a, b)
 
-print(list(set(a)))
+
+d = {
+    'a': 1,
+    'b': 2
+}
+somar(**d)
