@@ -20,6 +20,11 @@ class ArquivoPicke(Arquivo[Union[ListaVideos, ListaCanaisVideo]]):
         super().__init__(pasta_datalake, camada_datalake, assunto, nome_arquivo, metrica)
 
     def salvar_dados(self, dados: Union[ListaVideos, ListaCanaisVideo]):
+        """Método para salvar dados
+
+        Args:
+            dados (Union[ListaVideos, ListaCanaisVideo]): Uma lista de vídeos ou uma lista de par (id_canal, video)
+        """
         if not os.path.exists(self._diretorio_completo):
             os.makedirs(self._diretorio_completo, exist_ok=True)
 
@@ -38,6 +43,11 @@ class ArquivoPicke(Arquivo[Union[ListaVideos, ListaCanaisVideo]]):
                 pickle.dump(var, arquivo_pickle)
 
     def carregar_dados(self) -> Union[ListaVideos, ListaCanaisVideo]:
+        """Método para carregar dados
+
+        Returns:
+            Union[ListaVsideos, ListaCanaisVideo]: _description_
+        """
         if os.path.exists(self._diretorio_completo):
             with open(self._diretorio_completo, 'rb') as arquivo_pickle:
                 lista = pickle.load(arquivo_pickle)
