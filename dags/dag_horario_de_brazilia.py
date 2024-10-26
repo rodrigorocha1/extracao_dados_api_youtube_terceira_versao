@@ -6,6 +6,6 @@ with DAG('exemplo_jinja', start_date=datetime(2023, 1, 1), schedule_interval=Non
 
     bash_task = BashOperator(
         task_id="print_day_of_week",
-        bash_command="echo Today is {{ execution_date.in_tz('America/Sao_Paulo').strftime('%Y-%m-%dT%H:%M:%SZ') }}",
+        bash_command="echo Hoje é  is {{ execution_date.in_tz('America/Sao_Paulo').strftime('%Y-%m-%dT%H:%M:%SZ') }}",
     )
     bash_task
