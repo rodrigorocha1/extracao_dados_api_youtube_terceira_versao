@@ -1,5 +1,4 @@
 from hook.youtube_hook import YotubeHook
-from typing import Dict, Generator
 
 
 class YoutubeBuscaAssuntoHook(YotubeHook):

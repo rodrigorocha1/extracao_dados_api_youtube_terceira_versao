@@ -5,7 +5,6 @@ from airflow.providers.http.hooks.http import HttpHook
 import requests
 from src.dados.ioperacoes_dados import IoperacaoDados
 from config.variaveis import CHAVE_YOUTUBE, URL
-from googleapiclient.discovery import build
 
 
 class YotubeHook(HttpHook, ABC):
@@ -21,11 +20,6 @@ class YotubeHook(HttpHook, ABC):
         self._URL = URL
         self._CHAVE = CHAVE_YOUTUBE
         self._carregar_dados = carregar_dados
-        self._youtube = build(
-            'youtube',
-            'v3',
-            developerKey=self._CHAVE
-        )
         super().__init__(http_conn_id=self._conn_id)
 
     @abstractmethod
@@ -68,7 +62,7 @@ class YotubeHook(HttpHook, ABC):
                 else:
                     break
 
-    def conectar_api(self, url: str, params: Dict, session) -> requests.models.Response | bool:
+    def conectar_api(self, url: str, params: Dict, session) -> Optional[requests.models.Response]:
         """Método para conectar na api
 
         Args:
@@ -86,7 +80,7 @@ class YotubeHook(HttpHook, ABC):
 
             return self.run_and_check(session, prep, {})
         except:
-            return False
+            return None
 
     @abstractmethod
     def run(self):
