@@ -8,7 +8,7 @@ T = TypeVar('T')
 
 
 class Arquivo(IoperacaoDados[T], Generic[T]):
-    def __init__(self, pasta_datalake: str, camada_datalake: str, assunto: str, nome_arquivo: str, metrica: Optional[str] = None):
+    def __init__(self, pasta_datalake: str, camada_datalake: str, caminho_path_data: str, assunto: str, nome_arquivo: str, metrica: Optional[str] = None):
         """_summary_
 
         Args:
@@ -16,12 +16,14 @@ class Arquivo(IoperacaoDados[T], Generic[T]):
             camada_datalake (str): a camada do datalake, bronze, prata, ouro
             assunto (str): é o assunto de pesquisa
             nome_arquivo (str): o nome do arquivo
+            caminho_path_data (str): È o que vai armazenar a data de extracao Ex: extracao_dia_2024_10_27_15_00_00_tarde
             metrica (Optional[str], optional): o nome da métrica. Defaults to None.
         """
 
         self._caminho_base = os.getcwd()
         self._pasta_datalake = pasta_datalake
         self._camada_datalake = camada_datalake
+        self._caminho_path_data = caminho_path_data
         self._assunto = assunto
         self._metrica = metrica
         self._nome_arquivo = nome_arquivo
