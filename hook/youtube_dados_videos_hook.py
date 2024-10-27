@@ -4,7 +4,7 @@ from src.dados.ioperacoes_dados import IoperacaoDados
 
 
 class YoutubeBuscaVideoHook(YotubeHook):
-    def __init__(self, conn_id, carregar_canais_brasileiros: IoperacaoDados, carregar_dados=None):
+    def __init__(self,  carregar_canais_brasileiros: IoperacaoDados, carregar_dados=None,  conn_id=None,):
         self.__carregar_canais_brasileiros = carregar_canais_brasileiros
         super().__init__(conn_id, carregar_dados)
 

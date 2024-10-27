@@ -3,7 +3,8 @@ from src.dados.ioperacoes_dados import IoperacaoDados
 
 
 class YoutubeBuscaCanaisHook(YotubeHook):
-    def __init__(self, conn_id):
+    def __init__(self,  operacao_arquivo_pkl: IoperacaoDados,  conn_id=None):
+        self.__operacao_arquivo_pkl = operacao_arquivo_pkl
         super().__init__(conn_id)
 
     def _criar_url(self):
@@ -11,7 +12,7 @@ class YoutubeBuscaCanaisHook(YotubeHook):
 
     def run(self):
         session = self.get_conn()
-        lista_canais = self._carregar_dados.carregar_dados()
+        lista_canais = self.__operacao_arquivo_pkl.carregar_dados()
 
         url = self._criar_url()
         params = [

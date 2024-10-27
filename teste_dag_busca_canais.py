@@ -26,7 +26,7 @@ if __name__ == "__main__":
     data_hora_busca = data_hora_atual.subtract(hours=12)
     data_hora_busca = data_hora_busca.strftime('%Y-%m-%dT%H:%M:%SZ')
 
-    data_hora_formatada_api = data_hora_atual.strftime('%Y-%m-%d %H:%M:%S')
+    data_hora_formatada_api = data_hora_atual.strftime('%Y-%m-%d %H:%M')
     default_args = {
         'owner': 'airflow',
         'depends_on_past': False,
@@ -49,18 +49,10 @@ if __name__ == "__main__":
     ) as dag:
         assunto = 'python'
 
-        busca_assunto = YoutubeBuscaCanaisOperator(
+        busca_youtube = YoutubeBuscaCanaisOperator(
             task_id='extracao_canal',
-            operacao_hook=YoutubeBuscaCanaisHook(
-                carregar_dados=ArquivoPicke(
-                    camada_datalake='bronze',
-                    assunto=f'assunto_{assunto}',
-                    caminho_path_data=caminho_path_data,
-                    nome_arquivo='id_canais.pkl',
-                    pasta_datalake='datalake_youtube'
-                ),
-            ),
-            dados_arquivo_json_salvar=ArquivoJson(
+            assunto=assunto,
+            arquivo_json=ArquivoJson(
                 camada_datalake='bronze',
                 assunto=f'assunto_{assunto}',
                 metrica='estatisticas_canais',
@@ -68,16 +60,23 @@ if __name__ == "__main__":
                 nome_arquivo='req_canais.json',
                 pasta_datalake='datalake_youtube'
             ),
-            assunto=assunto,
-
-            dados_pkl_canal=ArquivoPicke(
+            arquivo_pkl_canal=ArquivoPicke(
                 camada_datalake='bronze',
                 assunto=f'assunto_{assunto}',
                 caminho_path_data=caminho_path_data,
                 nome_arquivo='id_canais_brasileiros.pkl',
                 pasta_datalake='datalake_youtube'
+            ),
+            operacao_hook=YoutubeBuscaCanaisHook(
+                operacao_arquivo_pkl=ArquivoPicke(
+                    camada_datalake='bronze',
+                    caminho_path_data=caminho_path_data,
+                    assunto=f'assunto_{assunto}',
+                    nome_arquivo='id_canais.pkl',
+                    pasta_datalake='datalake_youtube'
+                )
             )
         )
 
-    ti = TaskInstance(task=busca_assunto)
-    busca_assunto.execute(ti.task_id)
+    ti = TaskInstance(task=busca_youtube)
+    busca_youtube.execute(ti.task_id)

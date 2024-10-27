@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 from hook.youtube_hook import YotubeHook
 from operators.youtube_operator import YoutubeOperator
 from src.dados.ioperacoes_dados import IoperacaoDados
@@ -8,23 +8,21 @@ class YoutubeBuscaCanaisOperator(YoutubeOperator):
 
     def __init__(
             self,
-            dados_arquivo_json_salvar: IoperacaoDados,
-            dados_pkl_canal: IoperacaoDados,
+            task_id: str,
+            assunto: str,
             operacao_hook: YotubeHook,
-            task_id,
-            assunto=str,
-
-            dados_pkl_canal_video=None,
+            arquivo_json: IoperacaoDados,
+            arquivo_pkl_canal: IoperacaoDados,
+            arquivo_pkl_canal_video: Optional[IoperacaoDados] = None,
             **kwargs
     ):
         super().__init__(
-            dados_arquivo_json_salvar=dados_arquivo_json_salvar,
-            dados_pkl_canal=dados_pkl_canal,
-            operacao_hook=operacao_hook,
             task_id=task_id,
-            dados_pkl_canal_video=dados_pkl_canal_video,
             assunto=assunto,
-
+            operacao_hook=operacao_hook,
+            arquivo_json=arquivo_json,
+            arquivo_pkl_canal_video=arquivo_pkl_canal_video,
+            arquivo_pkl_canal=arquivo_pkl_canal,
             **kwargs
         )
 
@@ -35,8 +33,8 @@ class YoutubeBuscaCanaisOperator(YoutubeOperator):
 
                 req['assunto'] = self._assunto
 
-                self._dados_arquivo_json_salvar_req.salvar_dados(dados=req)
-                self._operacao_dados_pkl_canal.salvar_dados(id_canal)
+                self._arquivo_json.salvar_dados(dados=req)
+                self._arquivo_pkl_canal.salvar_dados(id_canal)
         except:
             pass
 

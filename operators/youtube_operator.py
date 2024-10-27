@@ -12,13 +12,14 @@ class YoutubeOperator(BaseOperator, ABC):
             assunto: str,
             operacao_hook: YotubeHook,
             arquivo_json: IoperacaoDados,
-            arquivo_pkl_canal_video: IoperacaoDados,
+
             arquivo_pkl_canal: IoperacaoDados,
+            arquivo_pkl_canal_video: Optional[IoperacaoDados] = None,
             **kwargs
     ):
         self._operacao_hook = operacao_hook
         self._arquivo_json = arquivo_json
-        self._asunto = assunto
+        self._assunto = assunto
         self._arquivo_pkl_canal_video = arquivo_pkl_canal_video
         self._arquivo_pkl_canal = arquivo_pkl_canal
         super().__init__(task_id=task_id, **kwargs)
