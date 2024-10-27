@@ -33,14 +33,13 @@ data_hora_atual = pendulum.parse(data_hora_atual)
 data_hora_busca = data_hora_atual.subtract(hours=12)
 data_hora_busca = data_hora_busca.strftime('%Y-%m-%dT%H:%M:%SZ')
 
-data_hora_formatada_api = data_hora_atual.strftime('%Y-%m-%d %H:%M:%S')
+data_hora_formatada_api = data_hora_atual.strftime('%Y-%m-%d %H:%M')
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
     'start_date': data_hora_busca,
 }
 
-caminho_path_data = f'extracao_data_{data_hora_formatada_api.replace("-", "_").replace(":", "_").replace(" ", "_")}{obter_turno(data_hora_atual.hour)}'
 
 with DAG(
     dag_id='extracao_api_youtube',
@@ -49,6 +48,8 @@ with DAG(
     default_args=default_args,
 ) as dag:
     assunto = 'python'
+    caminho_path_data = f'extracao_data_{data_hora_formatada_api.replace("-", "_").replace(":", "_").replace(" ", "_")}{obter_turno(data_hora_atual.hour)}'
+
     inicio = EmptyOperator(
         task_id="task_inicio_Dag"
 

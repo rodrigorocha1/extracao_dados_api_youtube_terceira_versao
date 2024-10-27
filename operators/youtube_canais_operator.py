@@ -29,17 +29,21 @@ class YoutubeBuscaCanaisOperator(YoutubeOperator):
         )
 
     def gravar_dados(self, req: Dict):
-        if len(req['items']) > 0 and req['items'][0]['snippet']['country'] == 'BR':
-            id_canal = req['items'][0]['id']
+        try:
+            if len(req['items']) > 0 and req['items'][0]['snippet']['country'] == 'BR':
+                id_canal = req['items'][0]['id']
 
-            req['assunto'] = self._assunto
+                req['assunto'] = self._assunto
 
-            self._dados_arquivo_json_salvar_req.salvar_dados(dados=req)
-            self._operacao_dados_pkl_canal.salvar_dados(id_canal)
+                self._dados_arquivo_json_salvar_req.salvar_dados(dados=req)
+                self._operacao_dados_pkl_canal.salvar_dados(id_canal)
+        except:
+            pass
 
     def execute(self, context):
         try:
             for json_response in self._operacao_hook.run():
                 self.gravar_dados(json_response)
-        except Exception:
+        except Exception as E:
+            print(E)
             exit

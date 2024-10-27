@@ -11,12 +11,29 @@ from src.dados.arquivo_pickle import ArquivoPicke
 if __name__ == "__main__":
     from airflow.models import BaseOperator, DAG, TaskInstance
 
+    def obter_turno(hora: int):
+        if 0 <= hora < 6:
+            return '_madrugada'
+        elif 6 <= hora < 12:
+            return '_manha'
+        elif 12 <= hora < 18:
+            return '_tarde'
+        else:
+            return '_noite'
+
     data_hora_atual = pendulum.now('America/Sao_Paulo').to_iso8601_string()
     data_hora_atual = pendulum.parse(data_hora_atual)
-    data_hora_busca = data_hora_atual.subtract(hours=7)
+    data_hora_busca = data_hora_atual.subtract(hours=12)
     data_hora_busca = data_hora_busca.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     data_hora_formatada_api = data_hora_atual.strftime('%Y-%m-%d %H:%M:%S')
+    default_args = {
+        'owner': 'airflow',
+        'depends_on_past': False,
+        'start_date': data_hora_busca,
+    }
+
+    caminho_path_data = f'extracao_data_{data_hora_formatada_api.replace("-", "_").replace(":", "_").replace(" ", "_")}{obter_turno(data_hora_atual.hour)}'
 
     default_args = {
         'owner': 'airflow',
@@ -38,6 +55,7 @@ if __name__ == "__main__":
                 carregar_dados=ArquivoPicke(
                     camada_datalake='bronze',
                     assunto=f'assunto_{assunto}',
+                    caminho_path_data=caminho_path_data,
                     nome_arquivo='id_canais.pkl',
                     pasta_datalake='datalake_youtube'
                 ),
@@ -46,6 +64,7 @@ if __name__ == "__main__":
                 camada_datalake='bronze',
                 assunto=f'assunto_{assunto}',
                 metrica='estatisticas_canais',
+                caminho_path_data=caminho_path_data,
                 nome_arquivo='req_canais.json',
                 pasta_datalake='datalake_youtube'
             ),
@@ -54,6 +73,7 @@ if __name__ == "__main__":
             dados_pkl_canal=ArquivoPicke(
                 camada_datalake='bronze',
                 assunto=f'assunto_{assunto}',
+                caminho_path_data=caminho_path_data,
                 nome_arquivo='id_canais_brasileiros.pkl',
                 pasta_datalake='datalake_youtube'
             )
