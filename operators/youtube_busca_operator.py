@@ -29,5 +29,8 @@ class YoutubeBuscaOperator(YoutubeOperator):
             dados=lista_canal_video)
 
     def execute(self, context):
-        for json_response in self._operacao_hook.rodar_dag():
-            self.gravar_dados(req=json_response)
+        try:
+            for json_response in self._operacao_hook.rodar_dag():
+                self.gravar_dados(req=json_response)
+        except:
+            exit

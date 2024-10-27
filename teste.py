@@ -35,39 +35,42 @@ def buscar_assunto(assunto: str, pageToken=None):
         publishedAfter=data_publicacao,
         pageToken=pageToken
     ).execute()
+    print(response.uri)
     return response
 
 
-def executar_paginacao(response):
-    if 'nextPageToken' in response:
-        pageToken = response['nextPageToken']
-        return True, pageToken
-    return False, None
+response = buscar_assunto(
+    assunto='Transport Fever 2', pageToken='')
+# def executar_paginacao(response):
+#     if 'nextPageToken' in response:
+#         pageToken = response['nextPageToken']
+#         return True, pageToken
+#     return False, None
 
 
-def rodar_dag():
-    flag_paginacao = True
-    page_token = ''
-    while flag_paginacao:
+# def rodar_dag():
+#     flag_paginacao = True
+#     page_token = ''
+#     while flag_paginacao:
 
-        response = buscar_assunto(
-            assunto='Transport Fever 2', pageToken=page_token)
-        print(type(response))
-        yield response
+#         response = buscar_assunto(
+#             assunto='Transport Fever 2', pageToken=page_token)
+#         print(type(response))
+#         yield response
 
-        flag_paginacao, page_token = executar_paginacao(response=response)
-        print(flag_paginacao, page_token)
+#         flag_paginacao, page_token = executar_paginacao(response=response)
+#         print(flag_paginacao, page_token)
 
 
-# [0]['snippet']['description']
-for dado in rodar_dag():
+# # [0]['snippet']['description']
+# for dado in rodar_dag():
 
-    video_ids = [item['id']['videoId'] for item in dado['items']]
-    canal_ids = [item['snippet']['channelId'] for item in dado['items']]
-    lista_canal_video = [(item['snippet']['channelId'],
-                          item['id']['videoId']) for item in dado['items']]
+#     video_ids = [item['id']['videoId'] for item in dado['items']]
+#     canal_ids = [item['snippet']['channelId'] for item in dado['items']]
+#     lista_canal_video = [(item['snippet']['channelId'],
+#                           item['id']['videoId']) for item in dado['items']]
 
-    print(lista_canal_video)
+#     print(lista_canal_video)
 
 # Exibir resposta formatada
 # print(type(buscar_assunto(assunto='Transport Fever 2')))

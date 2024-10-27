@@ -8,26 +8,37 @@ class YoutubeBuscaAssuntoHook(YotubeHook):
         self.__data_publicacao = data_publicacao
         super().__init__(conn_id, carregar_dados)
 
-    def conectar_api(self, **kwargs) -> Dict:
-        response = self._youtube.search().list(
-            q=self.__assunto_pesquisa,
-            type='video',
-            part='snippet',
-            maxResults=50,
-            publishedAfter=self.__data_publicacao,
-            pageToken=kwargs['pageToken']
-        ).execute()
+    def _criar_url(self) -> str:
+        """Retorna a url
+
+        Returns:
+            str: _description_
+        """
+        return self._URL + '/search/'
+
+    def run(self):
+        """Método para rodar a dag
+
+        Returns:
+            _type_: _description_
+        """
+        session = self.get_conn()
+
+        url = self._criar_url()
+
+        params = [
+            {
+                'part':  'snippet',
+                'key': self._CHAVE,
+                'regionCode': 'BR',
+                'relevanceLanguage': 'pt',
+                'maxResults': '50',
+                'publishedAfter': self.__data_publicacao,
+                'q': self.__assunto_pesquisa,
+                'pageToken': ''
+            }
+        ]
+
+        response = self._executar_paginacao(
+            url=url, session=session, params=params)
         return response
-
-    def rodar_dag(self) -> Generator[Dict, None, None]:
-        flag_paginacao = True
-        page_token = ''
-        while flag_paginacao:
-
-            response = self.conectar_api(pageToken=page_token)
-            print(type(response))
-            yield response
-
-            flag_paginacao, page_token = self._executar_paginacao(
-                response=response)
-            print(flag_paginacao, page_token)
