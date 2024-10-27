@@ -1,3 +1,4 @@
+
 from operators.youtube_operator import YoutubeOperator
 from hook.youtube_hook import YotubeHook
 from src.dados.ioperacoes_dados import IoperacaoDados
@@ -30,7 +31,8 @@ class YoutubeBuscaOperator(YoutubeOperator):
 
     def execute(self, context):
         try:
-            for json_response in self._operacao_hook.rodar_dag():
+            for json_response in self._operacao_hook.run():
                 self.gravar_dados(req=json_response)
-        except:
+        except Exception as E:
+            print(E)
             exit

@@ -32,16 +32,15 @@ class Arquivo(IoperacaoDados[T], Generic[T]):
                 self._pasta_datalake,
                 self._camada_datalake,
                 self._assunto,
-                self._metrica,
-                self._nome_arquivo
+                self._metrica
+
             )
         else:
             self._diretorio_completo = os.path.join(
                 self._caminho_base,
                 self._pasta_datalake,
                 self._camada_datalake,
-                self._assunto,
-                self._nome_arquivo
+                self._assunto
             )
 
     @abstractmethod

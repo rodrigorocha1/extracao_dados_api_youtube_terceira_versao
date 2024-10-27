@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from airflow.providers.http.hooks.http import HttpHook
 import requests
 from src.dados.ioperacoes_dados import IoperacaoDados
-from config.variaveis import CHAVE_YOUTUBE
+from config.variaveis import CHAVE_YOUTUBE, URL
 from googleapiclient.discovery import build
 
 
@@ -18,6 +18,7 @@ class YotubeHook(HttpHook, ABC):
             carregar_dados (IInfraDados, optional): tipo de carregamento de dados. Defaults to None.
         """
         self._conn_id = conn_id
+        self._URL = URL
         self._CHAVE = CHAVE_YOUTUBE
         self._carregar_dados = carregar_dados
         self._youtube = build(
