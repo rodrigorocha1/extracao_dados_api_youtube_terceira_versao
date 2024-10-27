@@ -2,21 +2,36 @@
 from operators.youtube_operator import YoutubeOperator
 from hook.youtube_hook import YotubeHook
 from src.dados.ioperacoes_dados import IoperacaoDados
-from typing import Dict
+from typing import Dict, Optional
 
 
 class YoutubeBuscaOperator(YoutubeOperator):
 
-    def __init__(self, operacao_hook: YotubeHook, task_id: str, dados_arquivo_json: IoperacaoDados, dados_pkl_canal_video: IoperacaoDados, dados_pkl_canal: IoperacaoDados, **kwargs):
+    def __init__(self,
+                 dados_arquivo_json_salvar: IoperacaoDados,
+                 dados_pkl_canal: IoperacaoDados,
+                 operacao_hook: YotubeHook,
+                 task_id,
+                 assunto: str,
+                 dados_pkl_canal_video: Optional[IoperacaoDados] = None,
 
-        self.__operacao_dados_json_req = dados_arquivo_json
-        self.__operacao_dados_pkl_canal_video = dados_pkl_canal_video
-        self.__operacao_dados_pkl_canal = dados_pkl_canal
+                 **kwargs):
+        super().__init__(
+            dados_arquivo_json_salvar=dados_arquivo_json_salvar,
+            dados_pkl_canal=dados_pkl_canal,
+            dados_pkl_canal_video=dados_pkl_canal_video,
+            operacao_hook=operacao_hook,
+            assunto=assunto,
 
-        super().__init__(operacao_hook=operacao_hook, task_id=task_id, **kwargs)
+            task_id=task_id,
+            **kwargs
+        )
 
     def gravar_dados(self, req: Dict):
-        self.__operacao_dados_json_req.salvar_dados(dados=req)
+        req['assunto'] = self._assunto
+
+        self._dados_arquivo_json_salvar_req.salvar_dados(dados=req)
+
         lista_canal_video = [
             (
                 item['snippet']['channelId'],
@@ -24,9 +39,16 @@ class YoutubeBuscaOperator(YoutubeOperator):
             )
             for item in req['items']
         ]
-        lista_canais = list(set(lista_canal_video[0]))
-        self.__operacao_dados_pkl_canal.salvar_dados(dados=lista_canais)
-        self.__operacao_dados_pkl_canal_video.salvar_dados(
+
+        lista_canais = [
+            item['snippet']['channelId']
+            for item in req['items']
+        ]
+        print(lista_canais)
+        print(lista_canal_video)
+
+        self._operacao_dados_pkl_canal.salvar_dados(dados=lista_canais)
+        self._operacao_dados_pkl_canal_video.salvar_dados(
             dados=lista_canal_video)
 
     def execute(self, context):

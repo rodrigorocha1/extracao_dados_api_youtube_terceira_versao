@@ -49,6 +49,8 @@ class ArquivoPicke(Arquivo[Union[ListaVideos, ListaCanaisVideo]]):
             Union[ListaVsideos, ListaCanaisVideo]: _description_
         """
         if os.path.exists(self._diretorio_completo):
-            with open(self._diretorio_completo, 'rb') as arquivo_pickle:
+            caminho_arquivo = os.path.join(
+                self._diretorio_completo, self._nome_arquivo)
+            with open(caminho_arquivo, 'rb') as arquivo_pickle:
                 lista = pickle.load(arquivo_pickle)
         return lista

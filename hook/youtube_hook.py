@@ -20,6 +20,7 @@ class YotubeHook(HttpHook, ABC):
         self._URL = URL
         self._CHAVE = CHAVE_YOUTUBE
         self._carregar_dados = carregar_dados
+
         super().__init__(http_conn_id=self._conn_id)
 
     @abstractmethod
