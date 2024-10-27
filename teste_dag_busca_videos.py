@@ -2,7 +2,7 @@ import pendulum
 
 from hook.youtube_busca_assunto_hook import YoutubeBuscaAssuntoHook
 from operators.youtube_busca_operator import YoutubeBuscaOperator
-from operators.youtube_video_operator import YoutubeBuscaVideoOperator
+from operators.youtube_video_operator import YoutubeVideoOperator
 from src.dados.arquivo_json import ArquivoJson
 from src.dados.arquivo_pickle import ArquivoPicke
 from hook.youtube_dados_videos_hook import YoutubeBuscaVideoHook
@@ -55,34 +55,8 @@ if __name__ == "__main__":
     ) as dag:
         assunto = 'python'
 
-        busca_assunto = YoutubeBuscaVideoOperator(
-            task_id='busca_video',
-            assunto=assunto,
-            dados_arquivo_json_salvar=ArquivoJson(
-                camada_datalake='bronze',
-                assunto=f'assunto_{assunto}',
-                metrica='estatisticas_canais',
-                caminho_path_data=caminho_path_data,
-                nome_arquivo='req_canais.json',
-                pasta_datalake='datalake_youtube'
-            ),
-            dados_pkl_canal=ArquivoPicke(
-                camada_datalake='bronze',
-                caminho_path_data=caminho_path_data,
-                assunto=f'assunto_{assunto}',
-                nome_arquivo='id_canais.pkl',
-                pasta_datalake='datalake_youtube'
-            ),
-            dados_pkl_canal_video=ArquivoPicke(
-                camada_datalake='bronze',
-                assunto=f'assunto_{assunto}',
-                caminho_path_data=caminho_path_data,
-                nome_arquivo='id_canais_videos.pkl',
-                pasta_datalake='datalake_youtube'
-            ),
-            operacao_hook=YoutubeBuscaVideoHook(
+        busca_assunto = YoutubeVideoOperator(
 
-            )
         )
 
     ti = TaskInstance(task=busca_assunto)

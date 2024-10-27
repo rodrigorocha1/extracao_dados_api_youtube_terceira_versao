@@ -21,8 +21,15 @@ class YoutubeVideoOperator(YoutubeOperator):
             dados_pkl_canal_video=None,
             **kwargs
     ):
-        super().__init__(dados_arquivo_json_salvar, dados_pkl_canal,
-                         operacao_hook, task_id, assunto, dados_pkl_canal_video, **kwargs)
+        super().__init__(
+            dados_arquivo_json_salvar=dados_arquivo_json_salvar,
+            dados_pkl_canal=dados_pkl_canal,
+            operacao_hook=operacao_hook,
+            task_id=task_id,
+            assunto=assunto,
+            dados_pkl_canal_video=dados_pkl_canal_video,
+            **kwargs
+        )
 
     def gravar_dados(self, req: Dict):
         if len(req['items']) > 0:
