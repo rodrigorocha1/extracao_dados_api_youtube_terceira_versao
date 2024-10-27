@@ -2,10 +2,11 @@ from hook.youtube_hook import YotubeHook
 
 
 class YoutubeBuscaAssuntoHook(YotubeHook):
-    def __init__(self, conn_id, assunto_pesquisa: str, data_publicacao: str, carregar_dados=None):
-        self.__assunto_pesquisa = assunto_pesquisa
+
+    def __init__(self,  data_publicacao: str, assunto_pesquisa=str, conn_id=None):
         self.__data_publicacao = data_publicacao
-        super().__init__(conn_id, carregar_dados)
+        self.__assunto_pesquisa = assunto_pesquisa
+        super().__init__(conn_id=conn_id)
 
     def _criar_url(self) -> str:
         """Retorna a url

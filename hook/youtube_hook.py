@@ -9,7 +9,7 @@ from config.variaveis import CHAVE_YOUTUBE, URL
 
 class YotubeHook(HttpHook, ABC):
 
-    def __init__(self, conn_id: str, carregar_dados: Optional[IoperacaoDados] = None) -> None:
+    def __init__(self, conn_id: str) -> None:
         """Método para inicializar o youtube hook
 
         Args:
@@ -19,7 +19,6 @@ class YotubeHook(HttpHook, ABC):
         self._conn_id = conn_id
         self._URL = URL
         self._CHAVE = CHAVE_YOUTUBE
-        self._carregar_dados = carregar_dados
 
         super().__init__(http_conn_id=self._conn_id)
 

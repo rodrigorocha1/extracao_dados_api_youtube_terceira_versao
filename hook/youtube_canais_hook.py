@@ -3,8 +3,8 @@ from src.dados.ioperacoes_dados import IoperacaoDados
 
 
 class YoutubeBuscaCanaisHook(YotubeHook):
-    def __init__(self, conn_id: str = None, carregar_dados: IoperacaoDados = None) -> None:
-        super().__init__(conn_id, carregar_dados)
+    def __init__(self, conn_id):
+        super().__init__(conn_id)
 
     def _criar_url(self):
         return self._URL + '/channels/'
