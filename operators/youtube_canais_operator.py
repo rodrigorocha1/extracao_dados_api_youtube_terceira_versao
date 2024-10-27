@@ -12,7 +12,7 @@ class YoutubeBuscaCanaisOperator(YoutubeOperator):
             assunto: str,
             operacao_hook: YotubeHook,
             arquivo_json: IoperacaoDados,
-            arquivo_pkl_canal: IoperacaoDados,
+            arquivo_pkl_canal: Optional[IoperacaoDados] = None,
             arquivo_pkl_canal_video: Optional[IoperacaoDados] = None,
             **kwargs
     ):
@@ -29,7 +29,7 @@ class YoutubeBuscaCanaisOperator(YoutubeOperator):
     def gravar_dados(self, req: Dict):
         try:
             if len(req['items']) > 0 and req['items'][0]['snippet']['country'] == 'BR':
-                id_canal = req['items'][0]['id']
+                id_canal = [req['items'][0]['id']]
 
                 req['assunto'] = self._assunto
 

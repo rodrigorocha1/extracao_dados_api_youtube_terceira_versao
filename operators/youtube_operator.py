@@ -13,7 +13,7 @@ class YoutubeOperator(BaseOperator, ABC):
             operacao_hook: YotubeHook,
             arquivo_json: IoperacaoDados,
 
-            arquivo_pkl_canal: IoperacaoDados,
+            arquivo_pkl_canal: Optional[IoperacaoDados] = None,
             arquivo_pkl_canal_video: Optional[IoperacaoDados] = None,
             **kwargs
     ):
