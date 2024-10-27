@@ -44,8 +44,6 @@ class YoutubeBuscaOperator(YoutubeOperator):
             item['snippet']['channelId']
             for item in req['items']
         ]
-        print(lista_canais)
-        print(lista_canal_video)
 
         self._operacao_dados_pkl_canal.salvar_dados(dados=lista_canais)
         self._operacao_dados_pkl_canal_video.salvar_dados(

@@ -34,6 +34,7 @@ class Arquivo(IoperacaoDados[T], Generic[T]):
                 self._pasta_datalake,
                 self._camada_datalake,
                 self._assunto,
+                self._caminho_path_data,
                 self._metrica
 
             )
@@ -43,6 +44,7 @@ class Arquivo(IoperacaoDados[T], Generic[T]):
                 self._pasta_datalake,
                 self._camada_datalake,
                 self._assunto
+
             )
 
     @abstractmethod
