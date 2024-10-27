@@ -29,6 +29,7 @@ class Arquivo(IoperacaoDados[T], Generic[T]):
         if self._metrica is not None:
             self._diretorio_completo = os.path.join(
                 self._caminho_base,
+                self._pasta_datalake,
                 self._camada_datalake,
                 self._assunto,
                 self._metrica,
@@ -37,6 +38,7 @@ class Arquivo(IoperacaoDados[T], Generic[T]):
         else:
             self._diretorio_completo = os.path.join(
                 self._caminho_base,
+                self._pasta_datalake,
                 self._camada_datalake,
                 self._assunto,
                 self._nome_arquivo
