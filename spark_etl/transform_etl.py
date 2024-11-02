@@ -80,24 +80,25 @@ def salvar_dados_particionados(dataframe: DataFrame, caminho_completo: str, part
 if __name__ == "__main__":
     print('______iniciando______________')
     caminho_base = os.getcwd()
-    # parser = argparse.ArgumentParser(
-    #     description='ETL YOUTUBE')
-    # parser.add_argument('--opcao', type=str, required=True,
-    #                     help='Opcao para obter a métrica')
-    # parser.add_argument('--path_extracao', type=str, required=True,
-    #                     help='camihno do arquivo')
-    # parser.add_argument('--path_metrica', type=str, required=True,
-    #                     help='camihno do arquivo')
-    # args = parser.parse_args()
-    # caminho_arquivo = args.caminho_arquivo
-    # opcao = args.opcao
-    # path_extracao = args.path_extracao
-    # path_metrica = args.path_metrica
-    # path_arquivo = args.path_arquivo
-    # caminho_arquivo = f'/home/rodrigo/Documentos/projetos/extracao_dados_api_youtube/datalake_youtube/bronze/*/{path_extracao}/{path_metrica}/{path_arquivo}'
+    parser = argparse.ArgumentParser(
+        description='ETL YOUTUBE')
+    parser.add_argument('--opcao', type=str, required=True,
+                        help='Opcao para obter a métrica')
+    parser.add_argument('--path_extracao', type=str, required=True,
+                        help='camihno do pasta data')
+    parser.add_argument('--path_metrica', type=str, required=True,
+                        help='camihno métrica')
+    parser.add_argument('--path_arquivo', type=str, required=True,
+                        help='camihno do arquivo')
+    args = parser.parse_args()
+    opcao = args.opcao
+    path_extracao = args.path_extracao
+    path_metrica = args.path_metrica
+    path_arquivo = args.path_arquivo
+    caminho_arquivo = f'/home/rodrigo/Documentos/projetos/extracao_dados_api_youtube/datalake_youtube/bronze/*/{path_extracao}/{path_metrica}/{path_arquivo}'
 
-    caminho_arquivo = '/home/rodrigo/Documentos/projetos/extracao_dados_api_youtube/datalake_youtube/bronze/assunto_power_bi/extracao_data_2024_11_02_11_49_manha/estatisticas_canais/req_canais.json'
-    opcao = 'C'
+    # caminho_arquivo = '/home/rodrigo/Documentos/projetos/extracao_dados_api_youtube/datalake_youtube/bronze/assunto_power_bi/extracao_data_2024_11_02_11_49_manha/estatisticas_canais/req_canais.json'
+    # opcao = 'C'
     spark = SparkSession.builder.appName("criar_dataframe").getOrCreate()
 
     dataframe = abrir_dataframe(
