@@ -1,4 +1,5 @@
 import pendulum
+from airflow.contrib.operators.spark_submit_operator import SparkSubmitOperator
 
 from hook.youtube_busca_assunto_hook import YoutubeBuscaAssuntoHook
 from operators.youtube_busca_operator import YoutubeBuscaOperator
@@ -31,7 +32,7 @@ if __name__ == "__main__":
         else:
             return '_noite'
 
-    caminho_path_data = f'extracao_data_2024_10_27_20_28_noite'
+    caminho_path_data = 'extracao_data_2024_11_02_11_49_manha'
 
     def obter_turno(hora: int):
         if 0 <= hora < 6:
@@ -55,13 +56,13 @@ if __name__ == "__main__":
         catchup=False,
         default_args=default_args,
     ) as dag:
-        assunto = 'python'
+        assunto = 'Power BI'
 
         busca_assunto = YoutubeVideoOperator(
             task_id='busca_videos',
             arquivo_pkl_canal_video=ArquivoPicke(
                 camada_datalake='bronze',
-                assunto=f'assunto_{assunto}',
+                assunto=f'assunto_{assunto.replace(" ","_").lower()}',
                 caminho_path_data=caminho_path_data,
                 nome_arquivo='id_canais_videos.pkl',
                 pasta_datalake='datalake_youtube'
@@ -69,7 +70,7 @@ if __name__ == "__main__":
             assunto=assunto,
             arquivo_json=ArquivoJson(
                 camada_datalake='bronze',
-                assunto=f'assunto_{assunto}',
+                assunto=f'assunto_{assunto.replace(" ","_").lower()}',
                 caminho_path_data=caminho_path_data,
                 metrica='estatisticas_video',
                 nome_arquivo='estatisticas_video.json',
@@ -78,14 +79,14 @@ if __name__ == "__main__":
             operacao_hook=YoutubeVideoHook(
                 carregar_canais_brasileiros=ArquivoPicke(
                     camada_datalake='bronze',
-                    assunto=f'assunto_{assunto}',
+                    assunto=f'assunto_{assunto.replace(" ","_").lower()}',
                     caminho_path_data=caminho_path_data,
                     nome_arquivo='id_canais_brasileiros.pkl',
                     pasta_datalake='datalake_youtube'
                 ),
                 carregar_dados=ArquivoPicke(
                     camada_datalake='bronze',
-                    assunto=f'assunto_{assunto}',
+                    assunto=f'assunto_{assunto.replace(" ","_").lower()}',
                     caminho_path_data=caminho_path_data,
                     nome_arquivo='id_canais_videos.pkl',
                     pasta_datalake='datalake_youtube'

@@ -54,73 +54,10 @@ with DAG(
         task_id="task_inicio_Dag"
 
     )
-    busca_assunto = YoutubeBuscaOperator(
-
-        assunto=assunto,
-
-        task_id='id_busca_youtube',
-        dados_arquivo_json_salvar=ArquivoJson(
-                camada_datalake='bronze',
-                assunto=f'assunto_{assunto}',
-                caminho_path_data=caminho_path_data,
-                metrica='requisicao_busca',
-                nome_arquivo='req_busca.json',
-                pasta_datalake='datalake_youtube'
-        ),
-        dados_pkl_canal=ArquivoPicke(
-            camada_datalake='bronze',
-            caminho_path_data=caminho_path_data,
-            assunto=f'assunto_{assunto}',
-            nome_arquivo='id_canais.pkl',
-            pasta_datalake='datalake_youtube'
-        ),
-        operacao_hook=YoutubeBuscaAssuntoHook(
-            assunto_pesquisa=f'{assunto}',
-            data_publicacao=data_hora_busca,
-            conn_id=None
-        ),
-        dados_pkl_canal_video=ArquivoPicke(
-            camada_datalake='bronze',
-            assunto=f'assunto_{assunto}',
-            caminho_path_data=caminho_path_data,
-            nome_arquivo='id_canais_videos.pkl',
-            pasta_datalake='datalake_youtube'
-        )
-    )
-
-    busca_dados_canais = YoutubeBuscaCanaisOperator(
-        task_id='extracao_canal',
-        operacao_hook=YoutubeBuscaCanaisHook(
-            carregar_dados=ArquivoPicke(
-                camada_datalake='bronze',
-                assunto=f'assunto_{assunto}',
-                caminho_path_data=caminho_path_data,
-                nome_arquivo='id_canais.pkl',
-                pasta_datalake='datalake_youtube'
-            ),
-        ),
-        dados_arquivo_json_salvar=ArquivoJson(
-            camada_datalake='bronze',
-            assunto=f'assunto_{assunto}',
-            metrica='estatisticas_canais',
-            caminho_path_data=caminho_path_data,
-            nome_arquivo='req_canais.json',
-            pasta_datalake='datalake_youtube'
-        ),
-        assunto=assunto,
-
-        dados_pkl_canal=ArquivoPicke(
-            camada_datalake='bronze',
-            assunto=f'assunto_{assunto}',
-            caminho_path_data=caminho_path_data,
-            nome_arquivo='id_canais_brasileiros.pkl',
-            pasta_datalake='datalake_youtube'
-        )
-    )
 
     fim = EmptyOperator(
         task_id="task_fim_Dag"
 
     )
 
-    inicio >> busca_assunto >> busca_dados_canais >> fim
+    inicio >> fim

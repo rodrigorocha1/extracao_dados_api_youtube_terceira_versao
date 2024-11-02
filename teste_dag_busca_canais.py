@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     data_hora_atual = pendulum.now('America/Sao_Paulo').to_iso8601_string()
     data_hora_atual = pendulum.parse(data_hora_atual)
-    data_hora_busca = data_hora_atual.subtract(hours=12)
+    data_hora_busca = data_hora_atual.subtract(hours=24)
     data_hora_busca = data_hora_busca.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     data_hora_formatada_api = data_hora_atual.strftime('%Y-%m-%d %H:%M')
@@ -33,8 +33,8 @@ if __name__ == "__main__":
         'start_date': data_hora_busca,
     }
 
-    caminho_path_data = f'extracao_data_{data_hora_formatada_api.replace("-", "_").replace(":", "_").replace(" ", "_")}{obter_turno(data_hora_atual.hour)}'
-
+    caminho_path_data = f'extracao_data_{data_hora_formatada_api.replace("-", "_").replace(":", "_").replace(" ", "_")}{obter_turno(data_hora_atual.hour).lower()}'
+    caminho_path_data = 'extracao_data_2024_11_02_11_49_manha'
     default_args = {
         'owner': 'airflow',
         'depends_on_past': False,
@@ -47,14 +47,14 @@ if __name__ == "__main__":
         catchup=False,
         default_args=default_args,
     ) as dag:
-        assunto = 'python'
+        assunto = 'Power BI'
 
         busca_youtube = YoutubeBuscaCanaisOperator(
             task_id='extracao_canal',
             assunto=assunto,
             arquivo_json=ArquivoJson(
                 camada_datalake='bronze',
-                assunto=f'assunto_{assunto}',
+                assunto=f'assunto_{assunto.replace(" ","_").lower()}',
                 metrica='estatisticas_canais',
                 caminho_path_data=caminho_path_data,
                 nome_arquivo='req_canais.json',
@@ -62,7 +62,7 @@ if __name__ == "__main__":
             ),
             arquivo_pkl_canal=ArquivoPicke(
                 camada_datalake='bronze',
-                assunto=f'assunto_{assunto}',
+                assunto=f'assunto_{assunto.replace(" ","_").lower()}',
                 caminho_path_data=caminho_path_data,
                 nome_arquivo='id_canais_brasileiros.pkl',
                 pasta_datalake='datalake_youtube'
@@ -71,7 +71,7 @@ if __name__ == "__main__":
                 operacao_arquivo_pkl=ArquivoPicke(
                     camada_datalake='bronze',
                     caminho_path_data=caminho_path_data,
-                    assunto=f'assunto_{assunto}',
+                    assunto=f'assunto_{assunto.replace(" ","_").lower()}',
                     nome_arquivo='id_canais.pkl',
                     pasta_datalake='datalake_youtube'
                 )

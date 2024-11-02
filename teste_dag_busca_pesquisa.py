@@ -50,14 +50,14 @@ if __name__ == "__main__":
         catchup=False,
         default_args=default_args,
     ) as dag:
-        assunto = 'python'
+        assunto = 'Power BI'
 
         busca_assunto = YoutubeBuscaOperator(
             task_id='id_busca_assunto',
             assunto=assunto,
             arquivo_json=ArquivoJson(
                 camada_datalake='bronze',
-                assunto=f'assunto_{assunto}',
+                assunto=f'assunto_{assunto.replace(" ","_").lower()}',
                 caminho_path_data=caminho_path_data,
                 metrica='requisicao_busca',
                 nome_arquivo='req_busca.json',
@@ -66,13 +66,13 @@ if __name__ == "__main__":
             arquivo_pkl_canal=ArquivoPicke(
                 camada_datalake='bronze',
                 caminho_path_data=caminho_path_data,
-                assunto=f'assunto_{assunto}',
+                assunto=f'assunto_{assunto.replace(" ","_").lower()}',
                 nome_arquivo='id_canais.pkl',
                 pasta_datalake='datalake_youtube'
             ),
             arquivo_pkl_canal_video=ArquivoPicke(
                 camada_datalake='bronze',
-                assunto=f'assunto_{assunto}',
+                assunto=f'assunto_{assunto.replace(" ","_").lower()}',
                 caminho_path_data=caminho_path_data,
                 nome_arquivo='id_canais_videos.pkl',
                 pasta_datalake='datalake_youtube'
