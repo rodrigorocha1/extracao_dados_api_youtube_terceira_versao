@@ -24,18 +24,22 @@ def fazer_tratamento_canais(dataframe: DataFrame) -> DataFrame:
         'assunto',
         F.explode('items').alias('items')
     ).select(
-        F.col('assunto').alias('ASSUNTO'),
+        F.col('assunto').alias('ASSUNTO').cast('string'),
         F.col('data_extracao').alias('DATA_EXTRACAO'),
-        F.year('data_extracao').alias('ANO_EXTRACAO'),
-        F.month('data_extracao').alias('MES_EXTRACAO'),
-        F.dayofmonth('data_extracao').alias('DIA_EXTRACAO'),
+        F.year('data_extracao').alias('ANO_EXTRACAO').cast('integer'),
+        F.month('data_extracao').alias('MES_EXTRACAO').cast('integer'),
+        F.dayofmonth('data_extracao').alias('DIA_EXTRACAO').cast('integer'),
         obter_turno(F.col('data_extracao')).alias('TURNO_EXTRACAO'),
-        F.col('items.id').alias('ID_CANAL'),
-        F.col('items.snippet.title').alias('NM_CANAL'),
-        F.col('items.statistics.subscriberCount').alias('TOTAL_INSCRITOS'),
-        F.col('items.statistics.videoCount').alias('TOTAL_VIDEOS_PUBLICADOS'),
-        F.col('items.statistics.viewCount').alias('TOTAL_VISUALIZACOES')
+        F.col('items.id').alias('ID_CANAL').cast('string'),
+        F.col('items.snippet.title').alias('NM_CANAL').cast('string'),
+        F.col('items.statistics.subscriberCount').alias(
+            'TOTAL_INSCRITOS').cast('integer'),
+        F.col('items.statistics.videoCount').alias(
+            'TOTAL_VIDEOS_PUBLICADOS').cast('integer'),
+        F.col('items.statistics.viewCount').alias(
+            'TOTAL_VISUALIZACOES').cast('integer')
     )
+
     return dataframe
 
 
@@ -44,23 +48,27 @@ def fazer_tratamento_video(dataframe: DataFrame) -> DataFrame:
         .select(
         F.col('assunto').alias('ASSUNTO'),
         F.col('data_extracao').alias('DATA_EXTRACAO'),
-        F.year('data_extracao').alias('ANO_EXTRACAO'),
-        F.month('data_extracao').alias('MES_EXTRACAO'),
-        F.dayofmonth('data_extracao').alias('DIA_EXTRACAO'),
+        F.year('data_extracao').alias('ANO_EXTRACAO').cast('integer'),
+        F.month('data_extracao').alias('MES_EXTRACAO').cast('integer'),
+        F.dayofmonth('data_extracao').alias('DIA_EXTRACAO').cast('integer'),
         obter_turno(F.col('data_extracao')).alias('TURNO_EXTRACAO'),
-        F.col('items.id').alias('ID_VIDEO'),
-        F.col('items.snippet.channelId').alias('ID_CANAL'),
-        F.col('items.snippet.title').alias('TITULO_VIDEO'),
-        F.col('items.snippet.description').alias('DESCRICAO'),
+        F.col('items.id').alias('ID_VIDEO').cast('string'),
+        F.col('items.snippet.channelId').alias('ID_CANAL').cast('string'),
+        F.col('items.snippet.title').alias('TITULO_VIDEO').cast('string'),
+        F.col('items.snippet.description').alias('DESCRICAO').cast('string'),
         F.col('items.contentDetails.duration').alias('DURACAO'),
         F.col('items.snippet.tags').alias('TAGS'),
 
         F.col('items.snippet.categoryid').alias('ID_CATEGORIA'),
-        F.col('items.statistics.viewCount').alias('TOTAL_VISUALIZACOES'),
-        F.col('items.statistics.likeCount').alias('TOTAL_LIKES'),
-        F.col('items.statistics.favoriteCount').alias('TOTAL_FAVORITOS'),
+        F.col('items.statistics.viewCount').alias(
+            'TOTAL_VISUALIZACOES').cast('integer'),
+        F.col('items.statistics.likeCount').alias(
+            'TOTAL_LIKES').cast('integer'),
+        F.col('items.statistics.favoriteCount').alias(
+            'TOTAL_FAVORITOS').cast('integer'),
 
-        F.col('items.statistics.commentCount').alias('TOTAL_COMENTARIOS')
+        F.col('items.statistics.commentCount').alias(
+            'TOTAL_COMENTARIOS').cast('integer')
     )
     dataframe = dataframe.withColumn('TOTAL_TAGS', F.when(
         F.size(dataframe.TAGS) <= 0, 0).otherwise(F.size(dataframe.TAGS)))
@@ -71,10 +79,9 @@ def fazer_tratamento_video(dataframe: DataFrame) -> DataFrame:
     return dataframe
 
 
-def salvar_dados_particionados(dataframe: DataFrame, caminho_completo: str, particoes: Tuple[str]):
+def salvar_dados_particionados(dataframe: DataFrame, caminho_completo: str):
     print(dataframe.show())
-    dataframe.write.mode("append").partitionBy(
-        particoes).parquet(caminho_completo)
+    dataframe.write.mode("append").parquet(caminho_completo)
 
 
 if __name__ == "__main__":
@@ -103,8 +110,11 @@ if __name__ == "__main__":
 
     dataframe = abrir_dataframe(
         spark, caminho_arquivo)
+
     if opcao == 'C':
         dataframe = fazer_tratamento_canais(dataframe)
+        print('Dataframe Print Schema')
+        print(dataframe.printSchema())
         caminho_arquivo = os.path.join(
             caminho_base, 'datalake_youtube', 'prata', 'estatisticas_canais')
         nome_arquivo = 'estatisticas_canais.parquet'
@@ -116,9 +126,10 @@ if __name__ == "__main__":
             caminho_base, 'datalake_youtube', 'prata', 'estatisticas_videos')
         particoes = "ASSUNTO", "ANO_EXTRACAO", "MES_EXTRACAO", "DIA_EXTRACAO", "TURNO_EXTRACAO", "ID_CANAL", "ID_VIDEO"
         nome_arquivo = 'estatisticas_videos.parquet'
-    caminho_completo = os.path.join(caminho_arquivo, nome_arquivo)
+    caminho_completo = os.path.join(
+        caminho_arquivo,  path_extracao, nome_arquivo)
     os.makedirs(caminho_arquivo, exist_ok=True)
-    print(dataframe.show())
+
     salvar_dados_particionados(
-        dataframe=dataframe, caminho_completo=caminho_completo, particoes=particoes)
+        dataframe=dataframe, caminho_completo=caminho_completo)
     spark.stop()
