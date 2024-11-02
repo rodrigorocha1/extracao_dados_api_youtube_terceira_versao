@@ -43,6 +43,7 @@ colorama==0.4.6
 colorlog==6.8.2
 ConfigUpdater==3.2
 connexion==2.14.2
+cramjam==2.9.0
 cron-descriptor==1.4.5
 croniter==3.0.3
 cryptography==42.0.8
@@ -54,6 +55,7 @@ duckdb==1.1.2
 duckdb_engine==0.13.4
 email_validator==2.2.0
 exceptiongroup==1.2.2
+fastparquet==2024.5.0
 Flask==2.2.5
 Flask-AppBuilder==4.5.0
 Flask-Babel==2.0.0
@@ -135,6 +137,7 @@ psutil==6.0.0
 psycopg2-binary==2.9.9
 pure-sasl==0.6.2
 py4j==0.10.9.5
+pyarrow==18.0.0
 pyasn1==0.6.1
 pyasn1_modules==0.4.1
 pycparser==2.22
