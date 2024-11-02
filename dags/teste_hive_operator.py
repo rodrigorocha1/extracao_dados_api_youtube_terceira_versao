@@ -19,7 +19,7 @@ dag = DAG(
 # Tarefa para executar uma consulta simples no Hive
 test_connection = HiveOperator(
     task_id='test_hive_connection_task',
-    hql='SELECT 1;',
+    hql='SELECT current_date();',
     hive_cli_conn_id='hive_conn',  # ID da conexão Hive
     dag=dag,
 )

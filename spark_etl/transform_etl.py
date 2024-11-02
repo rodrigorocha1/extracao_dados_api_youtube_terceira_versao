@@ -24,20 +24,21 @@ def fazer_tratamento_canais(dataframe: DataFrame) -> DataFrame:
         'assunto',
         F.explode('items').alias('items')
     ).select(
-        F.col('assunto').alias('ASSUNTO').cast('string'),
         F.col('data_extracao').alias('DATA_EXTRACAO'),
-        F.year('data_extracao').alias('ANO_EXTRACAO').cast('integer'),
-        F.month('data_extracao').alias('MES_EXTRACAO').cast('integer'),
-        F.dayofmonth('data_extracao').alias('DIA_EXTRACAO').cast('integer'),
-        obter_turno(F.col('data_extracao')).alias('TURNO_EXTRACAO'),
-        F.col('items.id').alias('ID_CANAL').cast('string'),
         F.col('items.snippet.title').alias('NM_CANAL').cast('string'),
         F.col('items.statistics.subscriberCount').alias(
             'TOTAL_INSCRITOS').cast('integer'),
         F.col('items.statistics.videoCount').alias(
             'TOTAL_VIDEOS_PUBLICADOS').cast('integer'),
         F.col('items.statistics.viewCount').alias(
-            'TOTAL_VISUALIZACOES').cast('integer')
+            'TOTAL_VISUALIZACOES').cast('integer'),
+
+        F.year('data_extracao').alias('ANO_EXTRACAO').cast('integer'),
+        F.month('data_extracao').alias('MES_EXTRACAO').cast('integer'),
+        F.dayofmonth('data_extracao').alias('DIA_EXTRACAO').cast('integer'),
+        obter_turno(F.col('data_extracao')).alias('TURNO_EXTRACAO'),
+        F.col('items.id').alias('ID_CANAL').cast('string'),
+        F.col('assunto').alias('ASSUNTO').cast('string'),
     )
 
     return dataframe
@@ -46,19 +47,12 @@ def fazer_tratamento_canais(dataframe: DataFrame) -> DataFrame:
 def fazer_tratamento_video(dataframe: DataFrame) -> DataFrame:
     dataframe = dataframe.select('data_extracao', 'assunto', F.explode('items').alias('items')) \
         .select(
-        F.col('assunto').alias('ASSUNTO'),
+
         F.col('data_extracao').alias('DATA_EXTRACAO'),
-        F.year('data_extracao').alias('ANO_EXTRACAO').cast('integer'),
-        F.month('data_extracao').alias('MES_EXTRACAO').cast('integer'),
-        F.dayofmonth('data_extracao').alias('DIA_EXTRACAO').cast('integer'),
-        obter_turno(F.col('data_extracao')).alias('TURNO_EXTRACAO'),
-        F.col('items.id').alias('ID_VIDEO').cast('string'),
-        F.col('items.snippet.channelId').alias('ID_CANAL').cast('string'),
         F.col('items.snippet.title').alias('TITULO_VIDEO').cast('string'),
         F.col('items.snippet.description').alias('DESCRICAO').cast('string'),
         F.col('items.contentDetails.duration').alias('DURACAO'),
         F.col('items.snippet.tags').alias('TAGS'),
-
         F.col('items.snippet.categoryid').alias('ID_CATEGORIA'),
         F.col('items.statistics.viewCount').alias(
             'TOTAL_VISUALIZACOES').cast('integer'),
@@ -66,16 +60,46 @@ def fazer_tratamento_video(dataframe: DataFrame) -> DataFrame:
             'TOTAL_LIKES').cast('integer'),
         F.col('items.statistics.favoriteCount').alias(
             'TOTAL_FAVORITOS').cast('integer'),
-
         F.col('items.statistics.commentCount').alias(
-            'TOTAL_COMENTARIOS').cast('integer')
+            'TOTAL_COMENTARIOS').cast('integer'),
+
+        F.year('data_extracao').alias('ANO_EXTRACAO').cast('integer'),
+        F.month('data_extracao').alias('MES_EXTRACAO').cast('integer'),
+        F.dayofmonth('data_extracao').alias('DIA_EXTRACAO').cast('integer'),
+        obter_turno(F.col('data_extracao')).alias('TURNO_EXTRACAO'),
+        F.col('assunto').alias('ASSUNTO').cast('string'),
+        F.col('items.id').alias('ID_VIDEO').cast('string'),
+        F.col('items.snippet.channelId').alias('ID_CANAL').cast('string')
     )
     dataframe = dataframe.withColumn('TOTAL_TAGS', F.when(
-        F.size(dataframe.TAGS) <= 0, 0).otherwise(F.size(dataframe.TAGS)))
+        F.size(dataframe.TAGS) <= 0, 0).otherwise(F.size(dataframe.TAGS)).cast('integer'))
     dataframe = dataframe.withColumn(
-        'TOTAL_PALAVRAS_TITULO', F.size(F.split(dataframe.TITULO_VIDEO, " ")))
+        'TOTAL_PALAVRAS_TITULO', F.size(F.split(dataframe.TITULO_VIDEO, " ")).cast('integer'))
     dataframe = dataframe.withColumn(
-        'TOTAL_PALAVRAS_DESCRICAO', F.size(F.split(dataframe.DESCRICAO, " ")))
+        'TOTAL_PALAVRAS_DESCRICAO', F.size(F.split(dataframe.DESCRICAO, " ")).cast('integer'))
+
+    dataframe = dataframe.select(
+        'DATA_EXTRACAO',
+        'TITULO_VIDEO',
+        'DESCRICAO',
+        'DURACAO',
+        'TAGS',
+        'ID_CATEGORIA',
+        'TOTAL_VISUALIZACOES'
+        'TOTAL_LIKES',
+        'TOTAL_FAVORITOS',
+        'TOTAL_COMENTARIOS',
+        'TOTAL_TAGS',
+        'TOTAL_PALAVRAS_TITULO',
+        'TOTAL_PALAVRAS_DESCRICAO',
+        'ANO_EXTRACAO',
+        'MES_EXTRACAO',
+        'DIA_EXTRACAO',
+        'TURNO_EXTRACAO',
+        'ASSUNTO',
+        'ID_VIDEO',
+        'ID_CANAL'
+    )
     return dataframe
 
 
