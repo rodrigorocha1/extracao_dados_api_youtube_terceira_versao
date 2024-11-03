@@ -23,7 +23,7 @@ from airflow.models import Variable
 from pyhive import hive
 
 
-def executar_comando_hive(metrica: str, path_extracao: str, nome_arquivo: str):
+def executar_comando_hive(metrica: str, path_extracao: str, nome_arquivo: str, nome_tabela: str):
     """_summary_
 
     Args:
@@ -45,7 +45,7 @@ def executar_comando_hive(metrica: str, path_extracao: str, nome_arquivo: str):
     cursor = conn.cursor()
     query = f"""
         LOAD DATA  INPATH '/opt/hive/prata/{metrica}/{path_extracao}/{nome_arquivo}/'
-        INTO TABLE estatisticas_canais
+        INTO TABLE {nome_tabela}
 
     """
 
@@ -223,6 +223,7 @@ with DAG(
         op_kwargs={
             'metrica': 'estatisticas_canais',
             'path_extracao': caminho_path_data,
+            'nome_tabela': 'estatisticas_canais',
             'nome_arquivo': 'estatisticas_canais.parquet'
         },
         provide_context=True,
