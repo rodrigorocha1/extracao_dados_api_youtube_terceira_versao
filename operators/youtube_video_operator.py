@@ -17,6 +17,7 @@ class YoutubeVideoOperator(YoutubeOperator):
 
     def gravar_dados(self, req: Dict):
         if len(req['items']) > 0:
+            req['assunto'] = self._assunto
             self._arquivo_json.salvar_dados(dados=req)
 
     def execute(self, context):
