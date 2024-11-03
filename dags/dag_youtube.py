@@ -15,12 +15,13 @@ from airflow.operators.python import PythonOperator
 from hook.youtube_busca_assunto_hook import YoutubeBuscaAssuntoHook
 from hook.youtube_canais_hook import YoutubeBuscaCanaisHook
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
-
+from airflow.utils.task_group import TaskGroup
 from operators.youtube_video_operator import YoutubeVideoOperator
 from src.dados.arquivo_json import ArquivoJson
 from src.dados.arquivo_pickle import ArquivoPicke
 from airflow.models import Variable
 from pyhive import hive
+from unidecode import unidecode
 
 
 def executar_comando_hive(metrica: str, path_extracao: str, nome_arquivo: str, nome_tabela: str):
@@ -79,6 +80,7 @@ default_args = {
     'start_date': data_hora_busca,
 }
 
+lista_assunto = ['Python', 'Power BI', 'cities skylines']
 
 with DAG(
     dag_id='extracao_api_youtube',
@@ -99,7 +101,8 @@ with DAG(
         assunto=assunto,
         arquivo_json=ArquivoJson(
                 camada_datalake='bronze',
-                assunto=f'assunto_{assunto.replace(" ","_").lower()}',
+                assunto=unidecode(
+                    f'assunto_{assunto.replace(" ","_").lower()}'),
                 caminho_path_data=caminho_path_data,
                 metrica='requisicao_busca',
                 nome_arquivo='req_busca.json',
@@ -108,13 +111,15 @@ with DAG(
         arquivo_pkl_canal=ArquivoPicke(
             camada_datalake='bronze',
             caminho_path_data=caminho_path_data,
-            assunto=f'assunto_{assunto.replace(" ","_").lower()}',
+            assunto=unidecode(
+                f'assunto_{assunto.replace(" ","_").lower()}'),
             nome_arquivo='id_canais.pkl',
             pasta_datalake='datalake_youtube'
         ),
         arquivo_pkl_canal_video=ArquivoPicke(
             camada_datalake='bronze',
-            assunto=f'assunto_{assunto.replace(" ","_").lower()}',
+            assunto=unidecode(
+                f'assunto_{assunto.replace(" ","_").lower()}'),
             caminho_path_data=caminho_path_data,
             nome_arquivo='id_canais_videos.pkl',
             pasta_datalake='datalake_youtube'
@@ -128,7 +133,8 @@ with DAG(
         assunto=assunto,
         arquivo_json=ArquivoJson(
                 camada_datalake='bronze',
-                assunto=f'assunto_{assunto.replace(" ","_").lower()}',
+                assunto=unidecode(
+                    f'assunto_{assunto.replace(" ","_").lower()}'),
                 metrica='estatisticas_canais',
                 caminho_path_data=caminho_path_data,
                 nome_arquivo='req_canais.json',
@@ -136,7 +142,8 @@ with DAG(
         ),
         arquivo_pkl_canal=ArquivoPicke(
             camada_datalake='bronze',
-            assunto=f'assunto_{assunto.replace(" ","_").lower()}',
+            assunto=unidecode(
+                f'assunto_{assunto.replace(" ","_").lower()}'),
             caminho_path_data=caminho_path_data,
             nome_arquivo='id_canais_brasileiros.pkl',
             pasta_datalake='datalake_youtube'
@@ -145,7 +152,8 @@ with DAG(
             operacao_arquivo_pkl=ArquivoPicke(
                 camada_datalake='bronze',
                 caminho_path_data=caminho_path_data,
-                assunto=f'assunto_{assunto.replace(" ","_").lower()}',
+                assunto=unidecode(
+                    f'assunto_{assunto.replace(" ","_").lower()}'),
                 nome_arquivo='id_canais.pkl',
                 pasta_datalake='datalake_youtube'
             )
@@ -156,7 +164,8 @@ with DAG(
         task_id='busca_videos',
         arquivo_pkl_canal_video=ArquivoPicke(
                 camada_datalake='bronze',
-                assunto=f'assunto_{assunto.replace(" ","_").lower()}',
+                assunto=unidecode(
+                    f'assunto_{assunto.replace(" ","_").lower()}'),
                 caminho_path_data=caminho_path_data,
                 nome_arquivo='id_canais_videos.pkl',
                 pasta_datalake='datalake_youtube'
@@ -164,7 +173,8 @@ with DAG(
         assunto=assunto,
         arquivo_json=ArquivoJson(
             camada_datalake='bronze',
-            assunto=f'assunto_{assunto.replace(" ","_").lower()}',
+            assunto=unidecode(
+                f'assunto_{assunto.replace(" ","_").lower()}'),
             caminho_path_data=caminho_path_data,
             metrica='estatisticas_video',
             nome_arquivo='estatisticas_video.json',
@@ -173,14 +183,16 @@ with DAG(
         operacao_hook=YoutubeVideoHook(
             carregar_canais_brasileiros=ArquivoPicke(
                 camada_datalake='bronze',
-                assunto=f'assunto_{assunto.replace(" ","_").lower()}',
+                assunto=unidecode(
+                    f'assunto_{assunto.replace(" ","_").lower()}'),
                 caminho_path_data=caminho_path_data,
                 nome_arquivo='id_canais_brasileiros.pkl',
                 pasta_datalake='datalake_youtube'
             ),
             carregar_dados=ArquivoPicke(
                 camada_datalake='bronze',
-                assunto=f'assunto_{assunto.replace(" ","_").lower()}',
+                assunto=unidecode(
+                    f'assunto_{assunto.replace(" ","_").lower()}'),
                 caminho_path_data=caminho_path_data,
                 nome_arquivo='id_canais_videos.pkl',
                 pasta_datalake='datalake_youtube'
