@@ -2,26 +2,42 @@ from airflow import DAG
 from airflow.providers.apache.hive.operators.hive import HiveOperator
 from airflow.utils.dates import days_ago
 
-# Defina os parâmetros da DAG
+# Configurações da DAG
 default_args = {
     'owner': 'airflow',
-    'retries': 1,
+    'depends_on_past': False,
+    'email_on_failure': False,
+    'email_on_retry': False,
 }
 
-dag = DAG(
-    dag_id='test_hive_connection',
+# Definição da DAG
+with DAG(
+    'criar_tabela_hive',
     default_args=default_args,
-    description='DAG para testar a conexão com o Apache Hive',
-    schedule_interval='@once',  # Execute uma vez
+    description='Criação de uma tabela no Apache Hive',
+    schedule_interval=None,
     start_date=days_ago(1),
-)
+    catchup=False,
+) as dag:
 
-# Tarefa para executar uma consulta simples no Hive
-test_connection = HiveOperator(
-    task_id='test_hive_connection_task',
-    hql='SELECT current_date();',
-    hive_cli_conn_id='hive_conn',  # ID da conexão Hive
-    dag=dag,
-)
+    # Query HiveQL para criação da tabela
+    create_table_hive = """
+    CREATE TABLE IF NOT EXISTS youtube.my_table (
+        id INT,
+        name STRING,
+        age INT
+    )
+    ROW FORMAT DELIMITED
+    FIELDS TERMINATED BY ','
+    STORED AS TEXTFILE;
+    """
 
-test_connection
+    criar_tabela = HiveOperator(
+        task_id='test_hive_connection_task',
+        hql=create_table_hive,
+        hive_cli_conn_id='hiveserver2_default',  # ID da conexão Hive
+        dag=dag,
+    )
+
+    # Definir a sequência de execução
+    criar_tabela

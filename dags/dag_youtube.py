@@ -11,13 +11,47 @@ from hook.youtube_dados_videos_hook import YoutubeVideoHook
 from operators.youtube_busca_operator import YoutubeBuscaOperator
 from operators.youtube_canais_operator import YoutubeBuscaCanaisOperator
 from airflow.operators.bash import BashOperator
+from airflow.operators.python import PythonOperator
 from hook.youtube_busca_assunto_hook import YoutubeBuscaAssuntoHook
 from hook.youtube_canais_hook import YoutubeBuscaCanaisHook
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
-from airflow.providers.apache.hive.operators.hive import HiveOperator
+
 from operators.youtube_video_operator import YoutubeVideoOperator
 from src.dados.arquivo_json import ArquivoJson
 from src.dados.arquivo_pickle import ArquivoPicke
+from airflow.models import Variable
+from pyhive import hive
+
+
+def executar_comando_hive(metrica: str, path_extracao: str, nome_arquivo: str):
+    """_summary_
+
+    Args:
+        metrica (str): estatisticas_canais
+        path_extracao (str): extracao_data_2024_11_02_11_49_manha
+        nome_arquivo (str): estatisticas_canais.parquet
+    """
+
+    host = Variable.get('HOST_HIVE')
+    port = Variable.get('PORT_HIVE')
+    database = Variable.get('DATABASE_HIVE')
+
+    conn = hive.Connection(
+        host=host,
+        port=port,
+        database=database
+    )
+
+    cursor = conn.cursor()
+    query = f"""
+        LOAD DATA  INPATH '/opt/hive/prata/{metrica}/{path_extracao}/{nome_arquivo}/'
+        INTO TABLE estatisticas_canais
+
+    """
+    print(query)
+    cursor.execute(query)
+
+    conn.close()
 
 
 def obter_turno(hora: int):
@@ -157,7 +191,7 @@ with DAG(
 
     transformacao_canal = SparkSubmitOperator(
         task_id='spark_transformacao_dados_canais',
-        conn_id='spark_default',  # Especifica o conn_id para o Spark
+        conn_id='spark_default',
         application="/home/rodrigo/Documentos/projetos/extracao_dados_api_youtube/spark_etl/transform_etl.py",
         application_args=[
             '--opcao', 'C',
@@ -166,23 +200,39 @@ with DAG(
             '--path_arquivo', 'req_canais.json'
         ],
     )
+    transformacao_video = SparkSubmitOperator(
+        task_id='spark_transformacao_dados_videos',
+        conn_id='spark_default',
+        application="/home/rodrigo/Documentos/projetos/extracao_dados_api_youtube/spark_etl/transform_etl.py",
+        application_args=[
+            '--opcao', 'V',
+            '--path_extracao', caminho_path_data,
+            '--path_metrica', 'estatisticas_video',
+            '--path_arquivo', 'estatisticas_video.json'
+        ],
+    )
 
     bash_copy_docker = BashOperator(
         task_id="id_copiar_camada_prata_docker",
         bash_command='docker cp /home/rodrigo/Documentos/projetos/extracao_dados_api_youtube/datalake_youtube/prata/ 957ec016ddf3:/opt/hive',
     )
 
-    task_exportar_dados_canais = HiveOperator(
-        task_id='test_hive_connection_task',
-        hql=f"""
-        LOAD DATA  INPATH '/opt/hive/prata/estatisticas_canais/{caminho_path_data}/estatisticas_canais.parquet/'
-        INTO TABLE estatisticas_canais ;""",
-        hive_cli_conn_id='hive_conn',  # ID da conexão Hive
-        dag=dag,
+    task_exportar_dados_canais = PythonOperator(
+        task_id='salvar_dados_hive',
+        python_callable=executar_comando_hive,
+        op_kwargs={
+            'metrica': 'estatisticas_canais',
+            'path_extracao': caminho_path_data,
+            'nome_arquivo': 'estatisticas_canais.parquet'
+        },
+        provide_context=True,
     )
     fim = EmptyOperator(
         task_id="task_fim_Dag"
 
     )
 
-    inicio >> busca_assunto >> busca_canais >> busca_video >> transformacao_canal >> bash_copy_docker >> fim
+    inicio >> busca_assunto >> busca_canais >> busca_video >> transformacao_canal >> transformacao_video >> bash_copy_docker
+    bash_copy_docker >> task_exportar_dados_canais >> fim
+
+    # inicio >> busca_assunto >> busca_canais >> busca_video >> transformacao_canal >> fim

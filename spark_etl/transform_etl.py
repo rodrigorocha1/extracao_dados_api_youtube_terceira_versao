@@ -86,7 +86,7 @@ def fazer_tratamento_video(dataframe: DataFrame) -> DataFrame:
         'DURACAO',
         'TAGS',
         'ID_CATEGORIA',
-        'TOTAL_VISUALIZACOES'
+        'TOTAL_VISUALIZACOES',
         'TOTAL_LIKES',
         'TOTAL_FAVORITOS',
         'TOTAL_COMENTARIOS',
@@ -132,6 +132,12 @@ if __name__ == "__main__":
     # path_extracao = 'extracao_data_2024_11_02_11_49_manha'
     # path_metrica = 'estatisticas_canais'
     # path_arquivo = 'req_canais.json'
+
+    # opcao = 'V'
+    # path_extracao = 'extracao_data_2024_11_02_noite'
+    # path_metrica = 'estatisticas_video'
+    # path_arquivo = 'estatisticas_video.json'
+
     caminho_arquivo = f'/home/rodrigo/Documentos/projetos/extracao_dados_api_youtube/datalake_youtube/bronze/*/{path_extracao}/{path_metrica}/{path_arquivo}'
 
     # caminho_arquivo = '/home/rodrigo/Documentos/projetos/extracao_dados_api_youtube/datalake_youtube/bronze/assunto_power_bi/extracao_data_2024_11_02_11_49_manha/estatisticas_canais/req_canais.json'

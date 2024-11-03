@@ -18,6 +18,8 @@ PARTITIONED BY (
 )
 STORED AS PARQUET;
 
+use youtube;
+
 DESCRIBE FORMATTED estatisticas_canais;
 
 SELECT * FROM estatisticas_canais ec ;
@@ -27,8 +29,11 @@ SELECT * FROM estatisticas_canais ec ;
 : Input path does not exist: file:/home/rodrigo/Documentos/projetos/extracao_dados_api_youtube/datalake_youtube/prata/estatisticas_canais/extracao_data_2024_11_02_11_49_manha/estatisticas_canais.parquet
 
 LOAD DATA  INPATH '/opt/hive/prata/estatisticas_canais/extracao_data_2024_11_02_11_49_manha/estatisticas_canais.parquet/'
-INTO TABLE estatisticas_canais ;
+INTO TABLE estatisticas_canais;
 
+
+LOAD DATA  INPATH '/opt/hive/prata/estatisticas_canais/extracao_data_2024_11_02_noite/estatisticas_canais.parquet/'
+INTO TABLE estatisticas_canais ;
 
 
 CREATE  TABLE esstatisticas_videos (
