@@ -95,111 +95,125 @@ with DAG(
         task_id="task_inicio_Dag"
 
     )
+    with TaskGroup('task_youtubee_api_historico_pesquisa', dag=dag) as tg1:
+        lista_task_assunto = []
+        for assunto in lista_assunto:
+            task_assunto = f'busca_assunto_{assunto.replace(" ","_").lower()}'
 
-    busca_assunto = YoutubeBuscaOperator(
-        task_id='busca_assunto',
-        assunto=assunto,
-        arquivo_json=ArquivoJson(
-                camada_datalake='bronze',
-                assunto=unidecode(
-                    f'assunto_{assunto.replace(" ","_").lower()}'),
-                caminho_path_data=caminho_path_data,
-                metrica='requisicao_busca',
-                nome_arquivo='req_busca.json',
-                pasta_datalake='datalake_youtube'
-        ),
-        arquivo_pkl_canal=ArquivoPicke(
-            camada_datalake='bronze',
-            caminho_path_data=caminho_path_data,
-            assunto=unidecode(
-                f'assunto_{assunto.replace(" ","_").lower()}'),
-            nome_arquivo='id_canais.pkl',
-            pasta_datalake='datalake_youtube'
-        ),
-        arquivo_pkl_canal_video=ArquivoPicke(
-            camada_datalake='bronze',
-            assunto=unidecode(
-                f'assunto_{assunto.replace(" ","_").lower()}'),
-            caminho_path_data=caminho_path_data,
-            nome_arquivo='id_canais_videos.pkl',
-            pasta_datalake='datalake_youtube'
-        ),
-        operacao_hook=YoutubeBuscaAssuntoHook(assunto_pesquisa=assunto,
-                                              data_publicacao=data_hora_busca)
-    )
-
-    busca_canais = YoutubeBuscaCanaisOperator(
-        task_id='extracao_canal',
-        assunto=assunto,
-        arquivo_json=ArquivoJson(
-                camada_datalake='bronze',
-                assunto=unidecode(
-                    f'assunto_{assunto.replace(" ","_").lower()}'),
-                metrica='estatisticas_canais',
-                caminho_path_data=caminho_path_data,
-                nome_arquivo='req_canais.json',
-                pasta_datalake='datalake_youtube'
-        ),
-        arquivo_pkl_canal=ArquivoPicke(
-            camada_datalake='bronze',
-            assunto=unidecode(
-                f'assunto_{assunto.replace(" ","_").lower()}'),
-            caminho_path_data=caminho_path_data,
-            nome_arquivo='id_canais_brasileiros.pkl',
-            pasta_datalake='datalake_youtube'
-        ),
-        operacao_hook=YoutubeBuscaCanaisHook(
-            operacao_arquivo_pkl=ArquivoPicke(
-                camada_datalake='bronze',
-                caminho_path_data=caminho_path_data,
-                assunto=unidecode(
-                    f'assunto_{assunto.replace(" ","_").lower()}'),
-                nome_arquivo='id_canais.pkl',
-                pasta_datalake='datalake_youtube'
+            busca_assunto = YoutubeBuscaOperator(
+                task_id=task_assunto,
+                assunto=assunto,
+                arquivo_json=ArquivoJson(
+                    camada_datalake='bronze',
+                    assunto=unidecode(
+                        f'assunto_{assunto.replace(" ","_").lower()}'),
+                    caminho_path_data=caminho_path_data,
+                    metrica='requisicao_busca',
+                    nome_arquivo='req_busca.json',
+                    pasta_datalake='datalake_youtube'
+                ),
+                arquivo_pkl_canal=ArquivoPicke(
+                    camada_datalake='bronze',
+                    caminho_path_data=caminho_path_data,
+                    assunto=unidecode(
+                        f'assunto_{assunto.replace(" ","_").lower()}'),
+                    nome_arquivo='id_canais.pkl',
+                    pasta_datalake='datalake_youtube'
+                ),
+                arquivo_pkl_canal_video=ArquivoPicke(
+                    camada_datalake='bronze',
+                    assunto=unidecode(
+                        f'assunto_{assunto.replace(" ","_").lower()}'),
+                    caminho_path_data=caminho_path_data,
+                    nome_arquivo='id_canais_videos.pkl',
+                    pasta_datalake='datalake_youtube'
+                ),
+                operacao_hook=YoutubeBuscaAssuntoHook(assunto_pesquisa=assunto,
+                                                      data_publicacao=data_hora_busca)
             )
-        )
-    )
-
-    busca_video = YoutubeVideoOperator(
-        task_id='busca_videos',
-        arquivo_pkl_canal_video=ArquivoPicke(
-                camada_datalake='bronze',
-                assunto=unidecode(
-                    f'assunto_{assunto.replace(" ","_").lower()}'),
-                caminho_path_data=caminho_path_data,
-                nome_arquivo='id_canais_videos.pkl',
-                pasta_datalake='datalake_youtube'
-        ),
-        assunto=assunto,
-        arquivo_json=ArquivoJson(
-            camada_datalake='bronze',
-            assunto=unidecode(
-                f'assunto_{assunto.replace(" ","_").lower()}'),
-            caminho_path_data=caminho_path_data,
-            metrica='estatisticas_video',
-            nome_arquivo='estatisticas_video.json',
-            pasta_datalake='datalake_youtube'
-        ),
-        operacao_hook=YoutubeVideoHook(
-            carregar_canais_brasileiros=ArquivoPicke(
-                camada_datalake='bronze',
-                assunto=unidecode(
-                    f'assunto_{assunto.replace(" ","_").lower()}'),
-                caminho_path_data=caminho_path_data,
-                nome_arquivo='id_canais_brasileiros.pkl',
-                pasta_datalake='datalake_youtube'
-            ),
-            carregar_dados=ArquivoPicke(
-                camada_datalake='bronze',
-                assunto=unidecode(
-                    f'assunto_{assunto.replace(" ","_").lower()}'),
-                caminho_path_data=caminho_path_data,
-                nome_arquivo='id_canais_videos.pkl',
-                pasta_datalake='datalake_youtube'
+            lista_task_assunto.append(busca_assunto)
+    with TaskGroup('task_youtubee_api_canais', dag=dag) as tg2:
+        lista_task_canais = []
+        for assunto in lista_assunto:
+            task_id_canal = f'extracao_canal_assunto_{assunto.replace(" ","_").lower()}'
+            busca_canais = YoutubeBuscaCanaisOperator(
+                task_id=task_id_canal,
+                assunto=assunto,
+                arquivo_json=ArquivoJson(
+                    camada_datalake='bronze',
+                    assunto=unidecode(
+                        f'assunto_{assunto.replace(" ","_").lower()}'),
+                    metrica='estatisticas_canais',
+                    caminho_path_data=caminho_path_data,
+                    nome_arquivo='req_canais.json',
+                    pasta_datalake='datalake_youtube'
+                ),
+                arquivo_pkl_canal=ArquivoPicke(
+                    camada_datalake='bronze',
+                    assunto=unidecode(
+                        f'assunto_{assunto.replace(" ","_").lower()}'),
+                    caminho_path_data=caminho_path_data,
+                    nome_arquivo='id_canais_brasileiros.pkl',
+                    pasta_datalake='datalake_youtube'
+                ),
+                operacao_hook=YoutubeBuscaCanaisHook(
+                    operacao_arquivo_pkl=ArquivoPicke(
+                        camada_datalake='bronze',
+                        caminho_path_data=caminho_path_data,
+                        assunto=unidecode(
+                            f'assunto_{assunto.replace(" ","_").lower()}'),
+                        nome_arquivo='id_canais.pkl',
+                        pasta_datalake='datalake_youtube'
+                    )
+                )
             )
-        ),
+            lista_task_canais.append(busca_canais)
+    with TaskGroup('task_youtubee_api_videos', dag=dag) as tg3:
+        lista_task_videos = []
 
-    )
+        for assunto in lista_assunto:
+            task_id_videos = f'busca_videos_assunto_{assunto.replace(" ","_").lower()}'
+            busca_video = YoutubeVideoOperator(
+                task_id=task_id_videos,
+                arquivo_pkl_canal_video=ArquivoPicke(
+                    camada_datalake='bronze',
+                    assunto=unidecode(
+                        f'assunto_{assunto.replace(" ","_").lower()}'),
+                    caminho_path_data=caminho_path_data,
+                    nome_arquivo='id_canais_videos.pkl',
+                    pasta_datalake='datalake_youtube'
+                ),
+                assunto=assunto,
+                arquivo_json=ArquivoJson(
+                    camada_datalake='bronze',
+                    assunto=unidecode(
+                        f'assunto_{assunto.replace(" ","_").lower()}'),
+                    caminho_path_data=caminho_path_data,
+                    metrica='estatisticas_video',
+                    nome_arquivo='estatisticas_video.json',
+                    pasta_datalake='datalake_youtube'
+                ),
+                operacao_hook=YoutubeVideoHook(
+                    carregar_canais_brasileiros=ArquivoPicke(
+                        camada_datalake='bronze',
+                        assunto=unidecode(
+                            f'assunto_{assunto.replace(" ","_").lower()}'),
+                        caminho_path_data=caminho_path_data,
+                        nome_arquivo='id_canais_brasileiros.pkl',
+                        pasta_datalake='datalake_youtube'
+                    ),
+                    carregar_dados=ArquivoPicke(
+                        camada_datalake='bronze',
+                        assunto=unidecode(
+                            f'assunto_{assunto.replace(" ","_").lower()}'),
+                        caminho_path_data=caminho_path_data,
+                        nome_arquivo='id_canais_videos.pkl',
+                        pasta_datalake='datalake_youtube'
+                    )
+                ),
+
+            )
+            lista_task_videos.append(busca_video)
 
     transformacao_canal = SparkSubmitOperator(
         task_id='spark_transformacao_dados_canais',
@@ -230,7 +244,7 @@ with DAG(
     )
 
     task_exportar_dados_canais = PythonOperator(
-        task_id='salvar_dados_hive',
+        task_id='salvar_dados_hive_canais',
         python_callable=executar_comando_hive,
         op_kwargs={
             'metrica': 'estatisticas_canais',
@@ -240,12 +254,25 @@ with DAG(
         },
         provide_context=True,
     )
+
+    task_exportar_dados_videos = PythonOperator(
+        task_id='salvar_dados_hive_videos',
+        python_callable=executar_comando_hive,
+        op_kwargs={
+            'metrica': 'estatisticas_videos',
+            'path_extracao': caminho_path_data,
+            'nome_tabela': 'estatisticas_videos',
+            'nome_arquivo': 'estatisticas_videos.parquet'
+        },
+        provide_context=True,
+    )
+
     fim = EmptyOperator(
         task_id="task_fim_Dag"
 
     )
 
-    inicio >> busca_assunto >> busca_canais >> busca_video >> transformacao_canal >> transformacao_video >> bash_copy_docker
-    bash_copy_docker >> task_exportar_dados_canais >> fim
+    inicio >> tg1 >> tg2 >> tg3 >> transformacao_canal >> transformacao_video >> bash_copy_docker
+    bash_copy_docker >> task_exportar_dados_canais >> task_exportar_dados_videos >> fim
 
     # inicio >> busca_assunto >> busca_canais >> busca_video >> transformacao_canal >> fim

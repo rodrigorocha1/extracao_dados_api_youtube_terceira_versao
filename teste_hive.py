@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def executar_comando_hive(metrica: str, path_extracao: str, nome_arquivo: str):
+def executar_comando_hive(metrica: str, path_extracao: str, nome_arquivo: str, nome_tabela: str):
     """_summary_
 
     Args:
@@ -24,10 +24,16 @@ def executar_comando_hive(metrica: str, path_extracao: str, nome_arquivo: str):
         database=database
     )
 
+    conn = hive.Connection(
+        host=host,
+        port=port,
+        database=database
+    )
+
     cursor = conn.cursor()
     query = f"""
-        LOAD DATA  INPATH '/opt/hive/prata/{metrica}/{path_extracao}/{nome_arquivo}/'
-        INTO TABLE estatisticas_canais
+        LOAD DATA  INPATH '/opt/hive/prata/estatisticas_videos/extracao_data_2024_11_02_noite/estatisticas_videos.parquet/'
+        INTO TABLE estatisticas_videos
 
     """
     print(query)
@@ -36,5 +42,5 @@ def executar_comando_hive(metrica: str, path_extracao: str, nome_arquivo: str):
     conn.close()
 
 
-executar_comando_hive(metrica='estatisticas_canais',
-                      path_extracao='extracao_data_2024_11_02_noite', nome_arquivo='estatisticas_canais.parquet')
+executar_comando_hive(metrica='estatisticas_videos',
+                      path_extracao='extracao_data_2024_11_02_noite', nome_arquivo='estatisticas_videos.parquet', nome_tabela='estatisticas_videos')

@@ -36,7 +36,7 @@ LOAD DATA  INPATH '/opt/hive/prata/estatisticas_canais/extracao_data_2024_11_02_
 INTO TABLE estatisticas_canais ;
 
 
-CREATE  TABLE esstatisticas_videos (
+CREATE  TABLE estatisticas_videos (
 	DATA_EXTRACAO string,
 	TITULO_VIDEO string,
 	DESCRICAO string,
@@ -46,7 +46,7 @@ CREATE  TABLE esstatisticas_videos (
 	TOTAL_VISUALIZACOES INT, 
 	TOTAL_LIKES INT,
 	TOTAL_FAVORITOS INT,
-	TOTAL_COMENTARIOS INT
+	TOTAL_COMENTARIOS INT,
 	TOTAL_TAGS INT,
 	TOTAL_PALAVRAS_TITULO INT,
 	TOTAL_PALAVRAS_DESCRICAO INT
@@ -78,8 +78,12 @@ FIELDS TERMINATED BY '|'
 COLLECTION ITEMS TERMINATED BY ','
 MAP KEYS TERMINATED BY ':';
 
+LOAD DATA  INPATH '/opt/hive/prata/estatisticas_videos/extracao_data_2024_11_02_noite/estatisticas_videos.parquet/'
+        INTO TABLE estatisticas_videos
 
-LOAD DATA LOCAL INPATH '/opt/hive/employee.txt'
-OVERWRITE INTO TABLE employee;
+SELECT *
+FROM estatisticas_videos;
+ LOAD DATA  INPATH '/opt/hive/prata/estatisticas_videos/extracao_data_2024_11_02_noite/estatisticas_videos.parquet/'
+        INTO TABLE estatisticas_videos
 
 -- docker cp prata/ 957ec016ddf3:/opt/hive
