@@ -48,7 +48,7 @@ def executar_comando_hive(metrica: str, path_extracao: str, nome_arquivo: str):
         INTO TABLE estatisticas_canais
 
     """
-    print(query)
+
     cursor.execute(query)
 
     conn.close()
