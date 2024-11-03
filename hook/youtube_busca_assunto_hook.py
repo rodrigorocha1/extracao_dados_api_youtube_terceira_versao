@@ -25,7 +25,8 @@ class YoutubeBuscaAssuntoHook(YotubeHook):
         session = self.get_conn()
 
         url = self._criar_url()
-
+        print(
+            f'== == == == == == == == == Data de consulta:{self.__data_publicacao} == == == == == == == == ==')
         params = [
             {
                 'part':  'snippet',
