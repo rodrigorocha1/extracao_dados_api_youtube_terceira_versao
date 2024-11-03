@@ -70,7 +70,7 @@ data_hora_atual = pendulum.now('America/Sao_Paulo').to_iso8601_string()
 data_hora_atual = pendulum.parse(data_hora_atual)
 hora_atual = int(data_hora_atual.hour)
 data = data_hora_atual.format('YYYY_MM_DD')
-data_hora_busca = data_hora_atual.subtract(hours=3)
+data_hora_busca = data_hora_atual.subtract(hours=7)
 data_hora_busca = data_hora_busca.strftime('%Y-%m-%dT%H:%M:%SZ')
 data = f'extracao_data_{data}{obter_turno(hora_atual)}'
 
@@ -80,7 +80,8 @@ default_args = {
     'start_date': data_hora_busca,
 }
 
-lista_assunto = ['Python', 'Power BI', 'cities skylines']
+lista_assunto = ['Python', 'Power BI',
+                 'Linux', 'monster hunter',  'cities skylines']
 
 with DAG(
     dag_id='extracao_api_youtube',
@@ -95,6 +96,7 @@ with DAG(
         task_id="task_inicio_Dag"
 
     )
+
     with TaskGroup('task_youtubee_api_historico_pesquisa', dag=dag) as tg1:
         lista_task_assunto = []
         for assunto in lista_assunto:
