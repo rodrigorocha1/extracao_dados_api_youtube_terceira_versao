@@ -13,7 +13,7 @@ class YoutubeBuscaCanaisHook(YotubeHook):
     def run(self):
         session = self.get_conn()
         lista_canais = self.__operacao_arquivo_pkl.carregar_dados()
-
+        print(lista_canais)
         url = self._criar_url()
         params = [
             {

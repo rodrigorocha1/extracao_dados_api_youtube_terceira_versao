@@ -20,6 +20,7 @@ class YoutubeVideoHook(YotubeHook):
         params = []
         for canal_video in lista_canais_video:
             if canal_video[0] in lista_canais_brasileiros:
+                print(canal_video)
                 param = {
                     'part':  'statistics,contentDetails,id,snippet,status',
                     'id': canal_video[1],
