@@ -1,0 +1,331 @@
+/*
+ * 
+ * Canais: 'UCCe4Be21OPPltTTIHP4lDvg'
+ */
+# consulta geral
+
+SELECT *
+from estatisticas_canais ec 
+where ec.assunto = 'cities skylines';
+
+
+# Total vísualizações 
+SELECT 
+data_extracao,
+    nm_canal,
+    turno_extracao,
+    total_videos_publicados ,
+    id_canal
+FROM 
+    estatisticas_canais ec 
+WHERE 
+    assunto = 'cities skylines'
+    AND id_canal = 'UCccdWOiGy2vEQKjUhNZHB_g'
+-- AND turno_extracao = 'Noite'
+ORDER BY 
+    data_extracao ASC;
+
+   
+   SELECT *
+   from estatisticas_canais;
+  
+1- # Total vísualizações/inscritos/videos_publicados turno canal
+SELECT 
+data_extracao,
+regexp_replace(
+        date_format(data_extracao, 'EEEE'),
+        'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+        CASE date_format(data_extracao, 'EEEE')
+            WHEN 'Monday' THEN 'Segunda-feira'
+            WHEN 'Tuesday' THEN 'Terça-feira'
+            WHEN 'Wednesday' THEN 'Quarta-feira'
+            WHEN 'Thursday' THEN 'Quinta-feira'
+            WHEN 'Friday' THEN 'Sexta-feira'
+            WHEN 'Saturday' THEN 'Sábado'
+            WHEN 'Sunday' THEN 'Domingo'
+        END
+    ) AS dia_da_semana,
+    nm_canal,
+    turno_extracao,
+    total_videos_publicados ,
+    LAG(total_videos_publicados, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao) AS total_videos_publicados_anterior
+FROM 
+    estatisticas_canais ec 
+WHERE 
+    assunto = 'cities skylines'
+    AND id_canal = 'UCrOH1V-FyMunBIMrKL0y0xQ'
+-- AND turno_extracao = 'Noite'
+ORDER BY 
+    data_extracao ASC;
+
+   
+   
+ #2 - Total vísualizações/inscritos/videos_publicado por dia
+ SELECT 
+	data_extracao,
+	regexp_replace(
+        date_format(data_extracao, 'EEEE'),
+        'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+        CASE date_format(data_extracao, 'EEEE')
+            WHEN 'Monday' THEN 'Segunda-feira'
+            WHEN 'Tuesday' THEN 'Terça-feira'
+            WHEN 'Wednesday' THEN 'Quarta-feira'
+            WHEN 'Thursday' THEN 'Quinta-feira'
+            WHEN 'Friday' THEN 'Sexta-feira'
+            WHEN 'Saturday' THEN 'Sábado'
+            WHEN 'Sunday' THEN 'Domingo'
+        END
+    ) AS dia_da_semana,
+    nm_canal,
+    turno_extracao,
+    total_videos_publicados,
+    COALESCE (LAG(total_videos_publicados, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao), 0) AS visualizacoes_anterior,
+	COALESCE (total_videos_publicados - LAG(total_videos_publicados, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao), 0) as total_visualizacoes_dia
+FROM 
+    estatisticas_canais ec 
+WHERE 
+    assunto = 'cities skylines'
+    AND id_canal = 'UCrOH1V-FyMunBIMrKL0y0xQ'
+    AND turno_extracao = 'Noite'
+ORDER BY 
+    data_extracao ASC;
+   
+   
+   
+   
+ ================DADOS VÌDEO =======================
+ 
+SELECT DISTINCT 
+	ec.id_canal as id_canal ,
+	ec.nm_canal as nm_canal ,
+	ec.assunto  as assunto 
+from estatisticas_canais ec ;
+ 
+SELECT *
+from estatisticas_videos ev 
+where ev.assunto = 'cities skylines'
+and ev.id_video = 'jU_ooxfchd4';
+
+
+# 3-  TOTAL Visualizações, total comentários e total_likes vídeo Turno 
+
+
+SELECT 
+	ev.turno_extracao as data_extracao,
+	ev.titulo_video,
+	ev.total_visualizacoes,
+	LAG(ev.total_visualizacoes, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao) AS total_videos_publicados_anterior,
+	CASE when coalesce(ev.total_visualizacoes -  LAG(ev.total_visualizacoes, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao), 0)   = 0
+		then ev.total_visualizacoes
+		else coalesce(ev.total_visualizacoes -  LAG(ev.total_visualizacoes, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao), 0) end  as total_visualizacoes_turno
+from estatisticas_videos ev 
+where ev.assunto = 'cities skylines'
+and ev.id_video = 'jU_ooxfchd4';
+
+
+
+# 4 - Total Visualizações, total comentários e total_likes  vídeo dia 
+
+
+SELECT 
+	ev.data_extracao as data_extracao,
+	ev.titulo_video,
+	ev.total_visualizacoes,
+	LAG(ev.total_visualizacoes, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao) AS total_videos_publicados_anterior,
+	CASE when coalesce(ev.total_visualizacoes -  LAG(ev.total_visualizacoes, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao), 0)   = 0
+		then ev.total_visualizacoes
+		else coalesce(ev.total_visualizacoes -  LAG(ev.total_visualizacoes, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao), 0) end  as total_visualizacoes_turno
+from estatisticas_videos ev 
+where ev.assunto = 'cities skylines'
+and ev.id_video = 'jU_ooxfchd4'
+And ev.turno_extracao = 'Noite';
+
+-- Engajamento dia
+
+ 
+SELECT 
+	ROUND(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100, 2) as taxa_engajamento
+from estatisticas_videos ev 
+where ev.assunto = 'cities skylines'
+and ev.id_video = 'jU_ooxfchd4'
+and ev.turno_extracao  = 'Noite';
+
+
+
+-- 5 - Média da taxa de engajamento do vídeo por dia
+SELECT 
+	ev.id_video, 
+	ev.dia_extracao ,
+	COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) as media_taxa_engajamento
+from estatisticas_videos ev 
+where ev.assunto = 'cities skylines' 
+AND id_video  IN ('BDzwY2A4KPM', 'jU_ooxfchd4')
+GROUP  BY ev.id_video ,  ev.dia_extracao
+HAVING   COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) > 0
+ORDER BY  2 ;
+-- and ev.turno_extracao  = 'Noite';
+
+SELECT *
+from depara_video dv 
+where dv.id_video  in ('EvxKsuwWblg')
+
+
+SELECT   
+	ev.id_video ,
+	dvv.titulo_video, 
+	regexp_replace(
+        date_format(ev.data_extracao, 'EEEE'),
+        'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+        CASE date_format(data_extracao, 'EEEE')
+            WHEN 'Monday' THEN 'Segunda-feira'
+            WHEN 'Tuesday' THEN 'Terça-feira'
+            WHEN 'Wednesday' THEN 'Quarta-feira'
+            WHEN 'Thursday' THEN 'Quinta-feira'
+            WHEN 'Friday' THEN 'Sexta-feira'
+            WHEN 'Saturday' THEN 'Sábado'
+            WHEN 'Sunday' THEN 'Domingo'
+        END
+    ) AS dia_da_semana ,
+    dayofweek(ev.data_extracao) as indice_semana ,
+	COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) as media_taxa_engajamento
+from estatisticas_videos ev 
+INNER JOIN (
+	SELECT *
+	FROM depara_video dv 
+	WHERE dv.assunto = 'cities skylines' 
+	AND dv.id_video  IN ('BDzwY2A4KPM', 'jU_ooxfchd4')
+) dvv on dvv.id_video = ev.id_video
+where ev.assunto = 'cities skylines' 
+AND ev.id_video  IN ('BDzwY2A4KPM', 'jU_ooxfchd4')
+GROUP  BY ev.id_video , dvv.titulo_video , regexp_replace(
+        date_format(ev.data_extracao, 'EEEE'),
+        'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+        CASE date_format(data_extracao, 'EEEE')
+            WHEN 'Monday' THEN 'Segunda-feira'
+            WHEN 'Tuesday' THEN 'Terça-feira'
+            WHEN 'Wednesday' THEN 'Quarta-feira'
+            WHEN 'Thursday' THEN 'Quinta-feira'
+            WHEN 'Friday' THEN 'Sexta-feira'
+            WHEN 'Saturday' THEN 'Sábado'
+            WHEN 'Sunday' THEN 'Domingo'
+        END
+    ) , dayofweek(ev.data_extracao) 
+HAVING   COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) > 0
+ORDER BY   4;
+
+
+
+
+
+---- 6 -Média engajamento  do  canal por visualização
+
+
+SELECT *
+from depara_canais dc 
+where dc.id_canal  in ('UCrOH1V-FyMunBIMrKL0y0xQ', 'UCCe4Be21OPPltTTIHP4lDvg');
+
+SELECT   
+	ev.id_canal ,
+	dcc.nm_canal, 
+	regexp_replace(
+        date_format(ev.data_extracao, 'EEEE'),
+        'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+        CASE date_format(data_extracao, 'EEEE')
+            WHEN 'Monday' THEN 'Segunda-feira'
+            WHEN 'Tuesday' THEN 'Terça-feira'
+            WHEN 'Wednesday' THEN 'Quarta-feira'
+            WHEN 'Thursday' THEN 'Quinta-feira'
+            WHEN 'Friday' THEN 'Sexta-feira'
+            WHEN 'Saturday' THEN 'Sábado'
+            WHEN 'Sunday' THEN 'Domingo'
+        END
+    ) AS dia_da_semana,
+	dayofweek(ev.data_extracao) as indice_semana,
+	COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) as media_taxa_engajamento
+from estatisticas_videos ev 
+INNER JOIN (
+	SELECT *
+	FROM depara_canais dc  
+	WHERE dc.assunto = 'cities skylines' 
+	AND dc.id_canal  in ('UCrOH1V-FyMunBIMrKL0y0xQ', 'UCCe4Be21OPPltTTIHP4lDvg')
+) dcc on dcc.id_canal = ev.id_canal 
+where ev.assunto = 'cities skylines' 
+AND ev.id_canal  in ('UCrOH1V-FyMunBIMrKL0y0xQ', 'UCCe4Be21OPPltTTIHP4lDvg')
+GROUP  BY ev.id_canal ,dcc.nm_canal , regexp_replace(
+        date_format(ev.data_extracao, 'EEEE'),
+        'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+        CASE date_format(data_extracao, 'EEEE')
+            WHEN 'Monday' THEN 'Segunda-feira'
+            WHEN 'Tuesday' THEN 'Terça-feira'
+            WHEN 'Wednesday' THEN 'Quarta-feira'
+            WHEN 'Thursday' THEN 'Quinta-feira'
+            WHEN 'Friday' THEN 'Sexta-feira'
+            WHEN 'Saturday' THEN 'Sábado'
+            WHEN 'Sunday' THEN 'Domingo'
+        END
+    ),dayofweek(ev.data_extracao)
+HAVING   COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) > 0
+ORDER BY   4;
+
+
+
+--  7 - média taxa engajamento do canal por total de inscritos
+ 
+SELECT *
+from estatisticas_canais ec ;
+
+SELECT *
+from estatisticas_videos ev 
+where ev.id_canal  in ('UCrOH1V-FyMunBIMrKL0y0xQ', 'UCCe4Be21OPPltTTIHP4lDvg');
+
+SELECT   
+    ev.id_canal,
+    dcc.nm_canal, 
+   	regexp_replace(
+        date_format(ev.data_extracao, 'EEEE'),
+        'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+        CASE date_format(data_extracao, 'EEEE')
+            WHEN 'Monday' THEN 'Segunda-feira'
+            WHEN 'Tuesday' THEN 'Terça-feira'
+            WHEN 'Wednesday' THEN 'Quarta-feira'
+            WHEN 'Thursday' THEN 'Quinta-feira'
+            WHEN 'Friday' THEN 'Sexta-feira'
+            WHEN 'Saturday' THEN 'Sábado'
+            WHEN 'Sunday' THEN 'Domingo'
+        END
+    ) AS dia_da_semana,
+    dayofweek(ev.data_extracao) as dia_semana,
+    COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / dcc.total_inscritos ) * 100), 2), 0) as media_taxa_engajamento
+FROM estatisticas_videos ev 
+INNER JOIN (
+    SELECT 
+        ec.total_inscritos as total_inscritos,
+        ec.id_canal as id_canal ,
+        ec.nm_canal as nm_canal
+    FROM estatisticas_canais ec  
+    WHERE ec.assunto = 'cities skylines' 
+    AND ec.id_canal in ('UCrOH1V-FyMunBIMrKL0y0xQ', 'UCCe4Be21OPPltTTIHP4lDvg') 
+) dcc on dcc.id_canal = ev.id_canal 
+WHERE ev.assunto = 'cities skylines' 
+AND ev.id_canal in ('UCrOH1V-FyMunBIMrKL0y0xQ', 'UCCe4Be21OPPltTTIHP4lDvg')
+GROUP BY ev.id_canal, dcc.nm_canal, regexp_replace(
+        date_format(ev.data_extracao, 'EEEE'),
+        'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+        CASE date_format(data_extracao, 'EEEE')
+            WHEN 'Monday' THEN 'Segunda-feira'
+            WHEN 'Tuesday' THEN 'Terça-feira'
+            WHEN 'Wednesday' THEN 'Quarta-feira'
+            WHEN 'Thursday' THEN 'Quinta-feira'
+            WHEN 'Friday' THEN 'Sexta-feira'
+            WHEN 'Saturday' THEN 'Sábado'
+            WHEN 'Sunday' THEN 'Domingo'
+        END
+    ), dayofweek(ev.data_extracao)
+HAVING COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) > 0
+ORDER BY 4;
+
+
+SELECT *
+FROM estatisticas_videos ev ;
+
+
