@@ -1,6 +1,6 @@
 from src.config.conexao import ConexaoBancoHive
 from src.config.config_banco import Base
-
+from typing import List
 import pandas as pd
 
 
@@ -209,4 +209,143 @@ class Medida:
 
         finally:
             self.__Sessao.close()
+        return dataframe
+
+    def obter_media_taxa_engajamento_dia(self, assunto: str, ids_video: List[str]):
+        placeholders = ', '.join([':id_video_' + str(i)
+                                 for i in range(len(ids_video))])
+        sql = f"""
+            SELECT   
+                ev.id_video as id_video,
+                dvv.titulo_video as titulo_video, 
+                regexp_replace(
+                    date_format(ev.data_extracao, 'EEEE'),
+                    'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+                    CASE date_format(data_extracao, 'EEEE')
+                        WHEN 'Monday' THEN 'Segunda-feira'
+                        WHEN 'Tuesday' THEN 'Terça-feira'
+                        WHEN 'Wednesday' THEN 'Quarta-feira'
+                        WHEN 'Thursday' THEN 'Quinta-feira'
+                        WHEN 'Friday' THEN 'Sexta-feira'
+                        WHEN 'Saturday' THEN 'Sábado'
+                        WHEN 'Sunday' THEN 'Domingo'
+                    END
+                ) AS dia_da_semana ,
+
+                COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) as media_taxa_engajamento
+            from estatisticas_videos ev 
+            INNER JOIN (
+                SELECT *
+                FROM depara_video dv 
+                WHERE dv.assunto = :assunto
+                AND dv.id_video  IN ({placeholders})
+            ) dvv on dvv.id_video = ev.id_video
+            where ev.assunto = :assunto
+            AND ev.id_video  IN ({placeholders})
+            GROUP  BY ev.id_video , dvv.titulo_video , regexp_replace(
+                    date_format(ev.data_extracao, 'EEEE'),
+                    'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+                    CASE date_format(data_extracao, 'EEEE')
+                        WHEN 'Monday' THEN 'Segunda-feira'
+                        WHEN 'Tuesday' THEN 'Terça-feira'
+                        WHEN 'Wednesday' THEN 'Quarta-feira'
+                        WHEN 'Thursday' THEN 'Quinta-feira'
+                        WHEN 'Friday' THEN 'Sexta-feira'
+                        WHEN 'Saturday' THEN 'Sábado'
+                        WHEN 'Sunday' THEN 'Domingo'
+                    END
+                ) , dayofweek(ev.data_extracao) 
+            HAVING   COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) > 0
+            ORDER BY   dayofweek(ev.data_extracao)
+        """
+
+        parametros = {'assunto': assunto}
+        for i, id_video in enumerate(ids_video):
+            parametros[f'id_video_{i}'] = id_video
+
+        try:
+            tipos = {
+                'id_video': 'string',
+                'titulo_video': 'string',
+                'dia_da_semana': 'string',
+                'media_taxa_engajamento': 'float64'
+
+            }
+            dataframe = pd.read_sql_query(
+                sql=sql, con=self.__conexao, params=parametros, dtype=tipos)
+
+        finally:
+            self.__Sessao.close()
+        return dataframe
+
+    def obter_media_engajamento_canal(self, ids_canal: List[str], assunto: str):
+
+        placeholders = ', '.join([':id_canal_' + str(i)
+                                 for i in range(len(ids_canal))])
+        sql = f"""
+        SELECT   
+            ev.id_canal as id_canal ,
+            dcc.nm_canal as nm_canal, 
+            regexp_replace(
+                date_format(ev.data_extracao, 'EEEE'),
+                'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+                CASE date_format(data_extracao, 'EEEE')
+                    WHEN 'Monday' THEN 'Segunda-feira'
+                    WHEN 'Tuesday' THEN 'Terça-feira'
+                    WHEN 'Wednesday' THEN 'Quarta-feira'
+                    WHEN 'Thursday' THEN 'Quinta-feira'
+                    WHEN 'Friday' THEN 'Sexta-feira'
+                    WHEN 'Saturday' THEN 'Sábado'
+                    WHEN 'Sunday' THEN 'Domingo'
+                END
+            ) AS dia_da_semana,
+
+            COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) as media_taxa_engajamento
+        from estatisticas_videos ev 
+        INNER JOIN (
+            SELECT *
+            FROM depara_canais dc  
+            WHERE dc.assunto = '{assunto}' 
+            AND dc.id_canal  in ({placeholders})
+        ) dcc on dcc.id_canal = ev.id_canal 
+        where ev.assunto = '{assunto}' 
+        AND ev.id_canal  in ({placeholders})
+        GROUP  BY ev.id_canal ,dcc.nm_canal , regexp_replace(
+                date_format(ev.data_extracao, 'EEEE'),
+                'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+                CASE date_format(data_extracao, 'EEEE')
+                    WHEN 'Monday' THEN 'Segunda-feira'
+                    WHEN 'Tuesday' THEN 'Terça-feira'
+                    WHEN 'Wednesday' THEN 'Quarta-feira'
+                    WHEN 'Thursday' THEN 'Quinta-feira'
+                    WHEN 'Friday' THEN 'Sexta-feira'
+                    WHEN 'Saturday' THEN 'Sábado'
+                    WHEN 'Sunday' THEN 'Domingo'
+                END
+            ),dayofweek(ev.data_extracao)
+        HAVING   COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) > 0
+        ORDER BY   	dayofweek(ev.data_extracao) 
+    """
+
+        parametros = {'assunto': assunto}
+        for i, id_canal in enumerate(ids_canal):
+            parametros[f'id_video_{i}'] = id_canal
+
+        try:
+
+            tipos = {
+                'id_video': 'string',
+                'titulo_video': 'string',
+                'dia_da_semana': 'string',
+                'media_taxa_engajamento': 'float64'
+
+            }
+
+            dataframe = pd.read_sql_query(
+                sql=sql, con=self.__conexao, params=parametros, dtype=tipos)
+
+        finally:
+
+            self.__Sessao.close()
+
         return dataframe
