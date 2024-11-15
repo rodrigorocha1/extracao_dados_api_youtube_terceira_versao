@@ -31,7 +31,7 @@ ORDER BY
   
 1- # Total vísualizações/inscritos/videos_publicados turno canal
 SELECT 
-data_extracao,
+turno_extracao,
 regexp_replace(
         date_format(data_extracao, 'EEEE'),
         'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
@@ -45,19 +45,23 @@ regexp_replace(
             WHEN 'Sunday' THEN 'Domingo'
         END
     ) AS dia_da_semana,
-    nm_canal,
-    turno_extracao,
     total_videos_publicados ,
-    LAG(total_videos_publicados, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao) AS total_videos_publicados_anterior,
-    total_videos_publicados - LAG(total_videos_publicados, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao) AS total_videos_publicados_turno
+    case when total_videos_publicados - (LAG(total_videos_publicados, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao)) IS NULL 
+    	then 0 
+    else  total_videos_publicados - (LAG(total_videos_publicados, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao)) end as total_videos_publicados_turno
 FROM 
-    estatisticas_canais ec 
+    estatisticas_canais 
 WHERE 
     assunto = 'cities skylines'
     AND id_canal = 'UCrOH1V-FyMunBIMrKL0y0xQ'
--- AND turno_extracao = 'Noite'
+    
+   
 ORDER BY 
     data_extracao ASC;
+
+   
+   
+   
 
    
    
