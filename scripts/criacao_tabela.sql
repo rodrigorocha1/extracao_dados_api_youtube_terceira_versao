@@ -36,34 +36,7 @@ LOAD DATA  INPATH '/opt/hive/prata/estatisticas_canais/extracao_data_2024_11_02_
 INTO TABLE estatisticas_canais ;
 
 
-CREATE  TABLE estatisticas_videos (
-	DATA_EXTRACAO string,
-	TITULO_VIDEO string,
-	DESCRICAO string,
-	DURACAO string,
-	TAGS ARRAY<string>,
-	ID_CATEGORIA string,
-	TOTAL_VISUALIZACOES INT, 
-	TOTAL_LIKES INT,
-	TOTAL_FAVORITOS INT,
-	TOTAL_COMENTARIOS INT,
-	TOTAL_TAGS INT,
-	TOTAL_PALAVRAS_TITULO INT,
-	TOTAL_PALAVRAS_DESCRICAO INT
-
-) 
-PARTITIONED BY(
-	ANO_EXTRACAO INT, 
-	MES_EXTRACAO INT, 
-	DIA_EXTRACAO INT, 
-	TURNO_EXTRACAO string,
-	ASSUNTO VARCHAR(30),
-	ID_VIDEO STRING,
-	ID_CANAL STRING
-	)
-STORED AS PARQUET;
-
-
+al 
 
 
 CREATE TABLE employee (
@@ -86,6 +59,16 @@ FROM estatisticas_videos
 GROUP BY id_video
 order by 2 DESC ;
 
+
+EXPLAIN SELECT id_video, COUNT(*)  TOTAL_VIDEO
+FROM estatisticas_videos
+GROUP BY id_video
+order by 2 DESC ;
+
+DESCRIBE EXTENDED estatisticas_videos;
+
+
+DESCRIBE FORMATTED estatisticas_videos;
 
 SELECT * 
 FROM estatisticas_videos
@@ -122,3 +105,9 @@ CREATE TABLE depara_video (
 ) 
 PARTITIONED BY (assunto STRING, id_canal STRING)
 STORED AS PARQUET;
+
+
+SELECT CURRENT_DATE()
+
+
+

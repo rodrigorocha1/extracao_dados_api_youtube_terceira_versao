@@ -1,46 +1,43 @@
-from pyhive import hive
-import pandas as pd
-import os
-from dotenv import load_dotenv
-load_dotenv()
+from src.config.conexao import ConexaoBancoHive
 
 
-def executar_comando_hive(metrica: str, path_extracao: str, nome_arquivo: str, nome_tabela: str):
-    """_summary_
-
-    Args:
-        metrica (str): estatisticas_canais
-        path_extracao (str): extracao_data_2024_11_02_11_49_manha
-        nome_arquivo (str): estatisticas_canais.parquet
-    """
-
-    host = os.environ['HOST_HIVE']
-    port = os.environ['PORT_HIVE']
-    database = os.environ['DATABASE_HIVE']
-
-    conn = hive.Connection(
-        host=host,
-        port=port,
-        database=database
-    )
-
-    conn = hive.Connection(
-        host=host,
-        port=port,
-        database=database
-    )
-
-    cursor = conn.cursor()
-    query = f"""
-        LOAD DATA  INPATH '/opt/hive/prata/estatisticas_videos/extracao_data_2024_11_02_noite/estatisticas_videos.parquet/'
-        INTO TABLE estatisticas_videos
-
-    """
-    print(query)
-    cursor.execute(query)
-
-    conn.close()
+cbh = ConexaoBancoHive()
+conexao_hive = cbh.obter_conexao()
 
 
-executar_comando_hive(metrica='estatisticas_videos',
-                      path_extracao='extracao_data_2024_11_02_noite', nome_arquivo='estatisticas_videos.parquet', nome_tabela='estatisticas_videos')
+with conexao_hive.connect() as conn:
+
+    sql = """
+            SELECT 
+        data_extracao,
+        regexp_replace(
+                date_format(data_extracao, 'EEEE'),
+                'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+                CASE date_format(data_extracao, 'EEEE')
+                    WHEN 'Monday' THEN 'Segunda-feira'
+                    WHEN 'Tuesday' THEN 'Terça-feira'
+                    WHEN 'Wednesday' THEN 'Quarta-feira'
+                    WHEN 'Thursday' THEN 'Quinta-feira'
+                    WHEN 'Friday' THEN 'Sexta-feira'
+                    WHEN 'Saturday' THEN 'Sábado'
+                    WHEN 'Sunday' THEN 'Domingo'
+                END
+            ) AS dia_da_semana,
+            nm_canal,
+            turno_extracao,
+            total_videos_publicados ,
+            LAG(total_videos_publicados, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao) AS total_videos_publicados_anterior
+        FROM 
+            estatisticas_canais ec 
+        WHERE 
+            assunto = 'cities skylines'
+            AND id_canal = 'UCrOH1V-FyMunBIMrKL0y0xQ'
+
+        ORDER BY 
+            data_extracao ASC
+
+        """
+    resultado = conn.execute(sql)
+    print(type(resultado))
+    for linha in resultado:
+        print(linha)
