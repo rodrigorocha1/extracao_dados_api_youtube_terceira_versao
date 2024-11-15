@@ -113,19 +113,36 @@ and ev.id_video = 'jU_ooxfchd4';
 
 
 # 3-  TOTAL Visualizações, total comentários e total_likes vídeo Turno 
+SELECT 
+	id_video,
+	titulo_video 
+from depara_video dv 
+WHERE dv.assunto = ;
 
+SELECT *
+from depara_canais dc ;
 
 SELECT 
-	ev.turno_extracao as data_extracao,
-	ev.titulo_video,
-	ev.total_visualizacoes,
-	LAG(ev.total_visualizacoes, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao) AS total_videos_publicados_anterior,
-	CASE when coalesce(ev.total_visualizacoes -  LAG(ev.total_visualizacoes, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao), 0)   = 0
-		then ev.total_visualizacoes
-		else coalesce(ev.total_visualizacoes -  LAG(ev.total_visualizacoes, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao), 0) end  as total_visualizacoes_turno
-from estatisticas_videos ev 
-where ev.assunto = 'cities skylines'
-and ev.id_video = 'jU_ooxfchd4';
+    ev.turno_extracao AS turno_extracao,
+    CASE 
+        WHEN COALESCE(
+            ev.total_visualizacoes - 
+            LAG(ev.total_visualizacoes, 1) OVER (PARTITION BY id_canal ORDER BY data_extracao), 
+            0
+        ) = 0
+        THEN ev.total_visualizacoes
+        ELSE COALESCE(
+            ev.total_visualizacoes - 
+            LAG(ev.total_visualizacoes, 1) OVER (PARTITION BY id_canal ORDER BY data_extracao), 
+            0
+        )
+    END AS total_visualizacoes_turno
+FROM 
+    estatisticas_videos ev
+WHERE 
+    ev.assunto = 'cities skylines'
+    AND ev.id_video = 'jU_ooxfchd4'
+
 
 
 
