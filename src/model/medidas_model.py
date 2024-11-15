@@ -14,11 +14,14 @@ class Medida:
 
     def obter_depara_video(self, assunto: str):
         sql = f"""
-            SELECT
-                id_video,
-                titulo_video
-            from depara_video
-            WHERE assunto = %s
+            
+                SELECT
+                    id_video,
+                    titulo_video
+                from
+                    depara_video
+                WHERE
+                    assunto = %s
         """
 
         parametros = (assunto, )
@@ -38,10 +41,10 @@ class Medida:
             SELECT
                 id_canal,
                 nm_canal
-
-
-            from depara_canais
-             WHERE assunto = %s
+            from
+                depara_canais
+            WHERE
+                assunto = % s
         """
         parametros = (assunto,)
         try:
@@ -61,12 +64,14 @@ class Medida:
 
     def obter_total_variacao_dados_canal_turno(self, assunto: str, id_canal: str, coluna_analise: str) -> pd.DataFrame:
         sql = f"""
+            
             SELECT
-            turno_extracao,
-            regexp_replace(
+                turno_extracao,
+                regexp_replace(
                     date_format(data_extracao, 'EEEE'),
                     'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
-                    CASE date_format(data_extracao, 'EEEE')
+                    CASE
+                        date_format(data_extracao, 'EEEE')
                         WHEN 'Monday' THEN 'Segunda-feira'
                         WHEN 'Tuesday' THEN 'Terça-feira'
                         WHEN 'Wednesday' THEN 'Quarta-feira'
@@ -77,17 +82,29 @@ class Medida:
                     END
                 ) AS dia_da_semana,
                 {coluna_analise},
-                case when  {coluna_analise} - (LAG( {coluna_analise}, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao)) IS NULL
-                    then 0
-                else   {coluna_analise} - (LAG( {coluna_analise}, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao)) end as {coluna_analise}_turno
+                case
+                    when {coluna_analise} - (
+                        LAG({coluna_analise}, 1) OVER(
+                            PARTITION BY id_canal
+                            ORDER BY
+                                data_extracao
+                        )
+                    ) IS NULL then 0
+                    else {coluna_analise} - (
+                        LAG({coluna_analise}, 1) OVER(
+                            PARTITION BY id_canal
+                            ORDER BY
+                                data_extracao
+                        )
+                    )
+                end as {coluna_analise}_turno
             FROM
                 estatisticas_canais
             WHERE
                 assunto = %s
-                AND id_canal =%s
-
+                AND id_canal = %s
             ORDER BY
-                data_extracao ASC;
+                data_extracao ASC
         """
 
         parametros = (assunto, id_canal)
@@ -109,32 +126,48 @@ class Medida:
 
     def obter_dado_canal_dia(self, assunto: str, id_canal: str, coluna_analise: str):
         sql = f"""
-            SELECT 
-            data_extracao,
-            regexp_replace(
-                date_format(data_extracao, 'EEEE'),
-                'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
-                CASE date_format(data_extracao, 'EEEE')
-                    WHEN 'Monday' THEN 'Segunda-feira'
-                    WHEN 'Tuesday' THEN 'Terça-feira'
-                    WHEN 'Wednesday' THEN 'Quarta-feira'
-                    WHEN 'Thursday' THEN 'Quinta-feira'
-                    WHEN 'Friday' THEN 'Sexta-feira'
-                    WHEN 'Saturday' THEN 'Sábado'
-                    WHEN 'Sunday' THEN 'Domingo'
-                END
-            ) AS dia_da_semana,
-            {coluna_analise},
-            COALESCE (LAG({coluna_analise}, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao), 0) AS {coluna_analise}_anterior,
-            COALESCE ({coluna_analise} - LAG({coluna_analise}, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao), 0) as {coluna_analise}_dia
-        FROM 
-            estatisticas_canais ec 
-        WHERE 
-            assunto = %s
-            AND id_canal = %s
-            AND turno_extracao = 'Noite'
-        ORDER BY 
-            data_extracao ASC
+            
+            SELECT
+                data_extracao,
+                regexp_replace(
+                    date_format(data_extracao, 'EEEE'),
+                    'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+                    CASE
+                        date_format(data_extracao, 'EEEE')
+                        WHEN 'Monday' THEN 'Segunda-feira'
+                        WHEN 'Tuesday' THEN 'Terça-feira'
+                        WHEN 'Wednesday' THEN 'Quarta-feira'
+                        WHEN 'Thursday' THEN 'Quinta-feira'
+                        WHEN 'Friday' THEN 'Sexta-feira'
+                        WHEN 'Saturday' THEN 'Sábado'
+                        WHEN 'Sunday' THEN 'Domingo'
+                    END
+                ) AS dia_da_semana,
+                {coluna_analise},
+                COALESCE (
+                    LAG({coluna_analise}, 1) OVER(
+                        PARTITION BY id_canal
+                        ORDER BY
+                            data_extracao
+                    ),
+                    0
+                ) AS {coluna_analise} _anterior,
+                COALESCE (
+                    {coluna_analise} - LAG({coluna_analise}, 1) OVER(
+                        PARTITION BY id_canal
+                        ORDER BY
+                            data_extracao
+                    ),
+                    0
+                ) as {coluna_analise}_dia
+            FROM
+                estatisticas_canais ec
+            WHERE
+                assunto = % s
+                AND id_canal = % s
+                AND turno_extracao = 'Noite'
+            ORDER BY
+                data_extracao ASC
    
         """
 
@@ -157,7 +190,7 @@ class Medida:
     def obter_total_dados_video_turno(self, id_video: str, assunto: str):
         sql = f"""
             SELECT 
-            ev.turno_extracao AS turno_extracao,
+                ev.turno_extracao AS turno_extracao,
             CASE 
                 WHEN COALESCE(
                     ev.total_visualizacoes - 

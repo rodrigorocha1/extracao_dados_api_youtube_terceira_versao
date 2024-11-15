@@ -9,6 +9,8 @@ class DashboardController:
         self.__model = Medida()
         self.__view = DashboardView()
 
-    def listar_canais_assunto(self, assunto: str):
+    def listar_canais_assunto(self, assunto: str, chave_input: int):
         dataframe = self.__model.obter_depara_canal(assunto=assunto)
-        self.__view.mostrar_usuarios(dataframe)
+        canais = self.__view.mostrar_input_canal(
+            dataframe, chave_input=chave_input)
+        return canais
