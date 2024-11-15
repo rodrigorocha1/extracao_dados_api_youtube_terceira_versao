@@ -10,18 +10,18 @@ class Medida:
         self.__db = ConexaoBancoHive()
         self.__conexao = self.__db.obter_conexao()
         self.__Sessao = self.__db.obter_sessao()
-        Base.metadata.create__all(self.__conexao)
+        Base.metadata.create_all(self.__conexao)
 
     def obter_depara_video(self, assunto: str):
         sql = f"""
-            SELECT 
+            SELECT
                 id_video,
-                titulo_video 
-            from depara_video  
-            WHERE assunto = ?
+                titulo_video
+            from depara_video
+            WHERE assunto = %s
         """
 
-        parametros = (assunto)
+        parametros = (assunto, )
         try:
             tipos = {
                 'id_video': 'string',
@@ -35,18 +35,15 @@ class Medida:
 
     def obter_depara_canal(self, assunto: str):
         sql = """
-            SELECT 
+            SELECT
                 id_canal,
                 nm_canal
-                
-                
-            from depara_canais  
-            where assunto = :assunto
 
+
+            from depara_canais
+             WHERE assunto = %s
         """
-        parametros = {
-            'assunto': assunto
-        }
+        parametros = (assunto,)
         try:
             tipos = {
                 'id_canal': 'string',
@@ -64,7 +61,7 @@ class Medida:
 
     def obter_total_variacao_dados_canal_turno(self, assunto: str, id_canal: str, coluna_analise: str) -> pd.DataFrame:
         sql = f"""
-            SELECT 
+            SELECT
             turno_extracao,
             regexp_replace(
                     date_format(data_extracao, 'EEEE'),
@@ -80,23 +77,20 @@ class Medida:
                     END
                 ) AS dia_da_semana,
                 {coluna_analise},
-                case when  {coluna_analise} - (LAG( {coluna_analise}, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao)) IS NULL 
-                    then 0 
+                case when  {coluna_analise} - (LAG( {coluna_analise}, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao)) IS NULL
+                    then 0
                 else   {coluna_analise} - (LAG( {coluna_analise}, 1) OVER(PARTITION BY id_canal ORDER BY data_extracao)) end as {coluna_analise}_turno
-            FROM 
-                estatisticas_canais 
-            WHERE 
-                assunto = :assunto
-                AND id_canal = :id_canal
-                
-            ORDER BY 
+            FROM
+                estatisticas_canais
+            WHERE
+                assunto = %s
+                AND id_canal =%s
+
+            ORDER BY
                 data_extracao ASC;
         """
 
-        parametros = {
-            'assunto': assunto,
-            'id_canal': id_canal
-        }
+        parametros = (assunto, id_canal)
 
         try:
             tipos = {
@@ -136,19 +130,15 @@ class Medida:
         FROM 
             estatisticas_canais ec 
         WHERE 
-            assunto = :assunto
-            AND id_canal = :id_canal
+            assunto = %s
+            AND id_canal = %s
             AND turno_extracao = 'Noite'
         ORDER BY 
             data_extracao ASC
    
         """
 
-        parametros = {
-            'assunto': assunto,
-            'id_canal': id_canal
-        }
-
+        parametros = (assunto, id_canal)
         try:
             tipos = {
                 'data_extracao': 'string',
@@ -184,14 +174,11 @@ class Medida:
         FROM 
             estatisticas_videos ev
         WHERE 
-            ev.assunto = :assunto
-            AND ev.id_video = :id_video
+            ev.assunto =  %s
+            AND ev.id_video =  %s
 
     """
-        parametros = {
-            'assunto': assunto,
-            'id_video': id_video
-        }
+        parametros = (assunto, id_video)
 
         try:
             tipos = {
@@ -212,8 +199,8 @@ class Medida:
         return dataframe
 
     def obter_media_taxa_engajamento_dia(self, assunto: str, ids_video: List[str]):
-        placeholders = ', '.join([':id_video_' + str(i)
-                                 for i in range(len(ids_video))])
+        placeholders = ', '.join(
+            [f":id_video_{i}" for i in range(len(ids_video))])
         sql = f"""
             SELECT   
                 ev.id_video as id_video,
@@ -280,8 +267,8 @@ class Medida:
 
     def obter_media_engajamento_canal(self, ids_canal: List[str], assunto: str):
 
-        placeholders = ', '.join([':id_canal_' + str(i)
-                                 for i in range(len(ids_canal))])
+        placeholders = ', '.join(
+            [f":id_video_{i}" for i in range(len(ids_canal))])
         sql = f"""
         SELECT   
             ev.id_canal as id_canal ,
