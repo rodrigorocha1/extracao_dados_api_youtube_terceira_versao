@@ -238,7 +238,7 @@ SELECT
             WHEN 'Sunday' THEN 'Domingo'
         END
     ) AS dia_da_semana ,
-    dayofweek(ev.data_extracao) as indice_semana ,
+
 	COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) as media_taxa_engajamento
 from estatisticas_videos ev 
 INNER JOIN (
@@ -263,7 +263,7 @@ GROUP  BY ev.id_video , dvv.titulo_video , regexp_replace(
         END
     ) , dayofweek(ev.data_extracao) 
 HAVING   COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) > 0
-ORDER BY   4;
+ORDER BY   dayofweek(ev.data_extracao);
 
 
 
@@ -292,7 +292,7 @@ SELECT
             WHEN 'Sunday' THEN 'Domingo'
         END
     ) AS dia_da_semana,
-	dayofweek(ev.data_extracao) as indice_semana,
+
 	COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) as media_taxa_engajamento
 from estatisticas_videos ev 
 INNER JOIN (
@@ -317,7 +317,7 @@ GROUP  BY ev.id_canal ,dcc.nm_canal , regexp_replace(
         END
     ),dayofweek(ev.data_extracao)
 HAVING   COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) > 0
-ORDER BY   4;
+ORDER BY   	dayofweek(ev.data_extracao) ;
 
 
 
