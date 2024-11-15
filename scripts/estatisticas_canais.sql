@@ -119,8 +119,13 @@ SELECT
 from depara_video dv 
 WHERE dv.assunto = ;
 
-SELECT *
-from depara_canais dc ;
+SELECT 
+	id_canal,
+	nm_canal
+	
+	
+from depara_canais  
+where assunto = ;
 
 SELECT 
     ev.turno_extracao AS turno_extracao,
@@ -178,11 +183,36 @@ and ev.turno_extracao  = 'Noite';
 SELECT 
 	ev.id_video, 
 	ev.dia_extracao ,
+	regexp_replace(
+        date_format(ev.data_extracao, 'EEEE'),
+        'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+        CASE date_format(data_extracao, 'EEEE')
+            WHEN 'Monday' THEN 'Segunda-feira'
+            WHEN 'Tuesday' THEN 'Terça-feira'
+            WHEN 'Wednesday' THEN 'Quarta-feira'
+            WHEN 'Thursday' THEN 'Quinta-feira'
+            WHEN 'Friday' THEN 'Sexta-feira'
+            WHEN 'Saturday' THEN 'Sábado'
+            WHEN 'Sunday' THEN 'Domingo'
+        END
+    ) as dia_semana,
 	COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) as media_taxa_engajamento
 from estatisticas_videos ev 
 where ev.assunto = 'cities skylines' 
 AND id_video  IN ('BDzwY2A4KPM', 'jU_ooxfchd4')
-GROUP  BY ev.id_video ,  ev.dia_extracao
+GROUP  BY ev.id_video ,  ev.dia_extracao, regexp_replace(
+        date_format(ev.data_extracao, 'EEEE'),
+        'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+        CASE date_format(data_extracao, 'EEEE')
+            WHEN 'Monday' THEN 'Segunda-feira'
+            WHEN 'Tuesday' THEN 'Terça-feira'
+            WHEN 'Wednesday' THEN 'Quarta-feira'
+            WHEN 'Thursday' THEN 'Quinta-feira'
+            WHEN 'Friday' THEN 'Sexta-feira'
+            WHEN 'Saturday' THEN 'Sábado'
+            WHEN 'Sunday' THEN 'Domingo'
+        END
+    )
 HAVING   COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) > 0
 ORDER BY  2 ;
 -- and ev.turno_extracao  = 'Noite';
