@@ -55,48 +55,79 @@ def main():
             )
 
             with tab1:
-                st.write('Total vísualizações')
                 coluna_analise = 'total_visualizacoes'
-                canal = dc.listar_canais_assunto(
+                canal_um = dc.listar_canais_assunto(
                     assunto=assunto, chave_input=1)
-                dc.gerar_dados_total_por_canal(
-                    canal=canal, assunto=assunto, flag=2, coluna_analise=coluna_analise)
+                dc.gerar_dados_total_por_canal_turno(
+                    canal=canal_um, assunto=assunto, flag=2, coluna_analise=coluna_analise)
 
             with tab2:
                 st.write('Total Inscritos')
                 coluna_analise = 'total_inscritos'
-                canal = dc.listar_canais_assunto(
+                canal_dois = dc.listar_canais_assunto(
                     assunto=assunto, chave_input=2)
-                dc.gerar_dados_total_por_canal(
-                    canal=canal, assunto=assunto, flag=2, coluna_analise=coluna_analise)
+                dc.gerar_dados_total_por_canal_turno(
+                    canal=canal_dois, assunto=assunto, flag=2, coluna_analise=coluna_analise)
 
             with tab3:
                 st.write('Total Vídeo')
                 coluna_analise = 'total_videos_publicados'
-                canal = dc.listar_canais_assunto(
+                canal_tres = dc.listar_canais_assunto(
                     assunto=assunto, chave_input=3)
-                dc.gerar_dados_total_por_canal(
-                    canal=canal, assunto=assunto, flag=2, coluna_analise=coluna_analise)
+                dc.gerar_dados_total_por_canal_turno(
+                    canal=canal_tres, assunto=assunto, flag=2, coluna_analise=coluna_analise)
 
         with col2:
-            st.write(
-                '# 2 - Total vísualizações/inscritos/videos_publicado por dia canal'
+
+            st.markdown(
+                """
+                    <div style="text-align: center;">
+                        <strong>Total vísualizações/inscritos/videos_publicado por dia canal</strong>
+                    </div>
+                """,
+                unsafe_allow_html=True
             )
+
+            tab1, tab2, tab3 = st.tabs(
+                ['Total vísualizações', 'Total Inscritos', 'Total Vídeo']
+            )
+
+            with tab1:
+                coluna_analise = 'total_visualizacoes'
+                canal = dc.listar_canais_assunto(
+                    assunto=assunto, chave_input=4)
+                dc.gerar_dados_canal_dia(
+                    canal=canal, assunto=assunto, flag=2, coluna_analise=coluna_analise)
+            with tab2:
+                coluna_analise = 'total_inscritos'
+                canal = dc.listar_canais_assunto(
+                    assunto=assunto, chave_input=5)
+                dc.gerar_dados_canal_dia(
+                    canal=canal, assunto=assunto, flag=2, coluna_analise=coluna_analise)
+            with tab3:
+                coluna_analise = 'total_videos_publicados'
+                canal = dc.listar_canais_assunto(
+                    assunto=assunto, chave_input=6)
+                dc.gerar_dados_canal_dia(
+                    canal=canal, assunto=assunto, flag=2, coluna_analise=coluna_analise)
 
     with st.container():
         st.write('Análise vídeo')
 
-        col1, col2, col3 = st.columns(3)
-        with col1:
+        tab1, tab2, tab3 = st.tabs(
+            ['Total vísualizações', 'Total Inscritos', 'Total Vídeo']
+        )
+        with tab1:
+
             st.write(
-                '# 3-  TOTAL Visualizações, total comentários e total_likes vídeo Turno '
+                'Total Visualizações, total comentários e total_likes vídeo Turno '
             )
-        with col2:
+        with tab2:
             st.write(
                 '  # 4 - Total Visualizações, total comentários e total_likes  vídeo dia'
             )
 
-        with col3:
+        with tab3:
             st.write(
                 ' # 5 - Média da taxa de engajamento do vídeo por dia'
             )
