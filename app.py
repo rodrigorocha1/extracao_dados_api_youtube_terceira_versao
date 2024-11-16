@@ -51,16 +51,32 @@ def main():
                 unsafe_allow_html=True
             )
             tab1, tab2, tab3 = st.tabs(
-                ['Total vísualizações', 'Total Inscritos', 'Total Vídeo'])
+                ['Total vísualizações', 'Total Inscritos', 'Total Vídeo']
+            )
 
             with tab1:
                 st.write('Total vísualizações')
+                coluna_analise = 'total_visualizacoes'
+                canal = dc.listar_canais_assunto(
+                    assunto=assunto, chave_input=1)
+                dc.gerar_dados_total_por_canal(
+                    canal=canal, assunto=assunto, flag=2, coluna_analise=coluna_analise)
 
             with tab2:
                 st.write('Total Inscritos')
+                coluna_analise = 'total_inscritos'
+                canal = dc.listar_canais_assunto(
+                    assunto=assunto, chave_input=2)
+                dc.gerar_dados_total_por_canal(
+                    canal=canal, assunto=assunto, flag=2, coluna_analise=coluna_analise)
 
             with tab3:
                 st.write('Total Vídeo')
+                coluna_analise = 'total_videos_publicados'
+                canal = dc.listar_canais_assunto(
+                    assunto=assunto, chave_input=3)
+                dc.gerar_dados_total_por_canal(
+                    canal=canal, assunto=assunto, flag=2, coluna_analise=coluna_analise)
 
         with col2:
             st.write(

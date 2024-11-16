@@ -12,46 +12,82 @@ class Medida:
         self.__Sessao = self.__db.obter_sessao()
         Base.metadata.create_all(self.__conexao)
 
-    def obter_depara_video(self, assunto: str):
-        sql = f"""
-            
-                SELECT
-                    id_video,
-                    titulo_video
-                from
-                    depara_video
-                WHERE
-                    assunto = %s
-        """
+    def obter_depara_video(self, assunto: str, flag: int = None, titulo_video: str = None):
 
-        parametros = (assunto, )
-        try:
+        if flag == 1:
+            sql = f"""
+                
+                    SELECT
+                        id_video,
+                        titulo_video
+                    from
+                        depara_video
+                    WHERE
+                        assunto = %s
+            """
+            parametros = (assunto, )
             tipos = {
                 'id_video': 'string',
                 'titulo_video': 'string'
             }
+        else:
+            sql = f"""
+                
+                    SELECT
+                        id_video
+                        
+                    from
+                        depara_video
+                    WHERE
+                        assunto = %s
+                        and titulo_video = %s
+            """
+            tipos = {
+                'id_video': 'string'
+            }
+            parametros = (assunto, titulo_video)
+
+        try:
+
             dataframe = pd.read_sql_query(
                 sql=sql, con=self.__conexao, dtype=tipos, params=parametros)
         finally:
             self.__Sessao.close()
         return dataframe
 
-    def obter_depara_canal(self, assunto: str):
-        sql = """
-            SELECT
-                id_canal,
-                nm_canal
-            from
-                depara_canais
-            WHERE
-                assunto = % s
-        """
-        parametros = (assunto,)
-        try:
+    def obter_depara_canal(self, assunto: str, flag: int = None, titulo: str = None, nm_canal: str = None):
+        if flag == 1:
+            sql = """
+                SELECT
+                    id_canal,
+                    nm_canal
+                from
+                    depara_canais
+                WHERE
+                    assunto = %s
+            """
+            parametros = (assunto,)
             tipos = {
                 'id_canal': 'string',
                 'nm_canal': 'string'
             }
+        else:
+            sql = """
+                SELECT
+                    id_canal
+                from
+                    depara_canais
+                WHERE
+                    assunto = %s
+                    and nm_canal= %s
+            """
+            parametros = (assunto, nm_canal)
+            tipos = {
+                'id_canal': 'string'
+            }
+
+        try:
+
             dataframe = pd.read_sql_query(
                 sql=sql,
                 con=self.__conexao,
@@ -62,7 +98,7 @@ class Medida:
             self.__Sessao.close()
         return dataframe
 
-    def obter_total_variacao_dados_canal_turno(self, assunto: str, id_canal: str, coluna_analise: str) -> pd.DataFrame:
+    def obter_dados_canal_turno(self, assunto: str, id_canal: str, coluna_analise: str) -> pd.DataFrame:
         sql = f"""
             
             SELECT
@@ -113,8 +149,8 @@ class Medida:
             tipos = {
                 'turno_extracao': 'string',
                 'dia_da_semana': 'string',
-                'total_videos_publicados': 'int64',
-                'total_videos_publicados_turno': 'int64'
+                coluna_analise: 'int64',
+                f'{coluna_analise}': 'int64'
             }
 
             dataframe = pd.read_sql_query(
@@ -151,7 +187,7 @@ class Medida:
                             data_extracao
                     ),
                     0
-                ) AS {coluna_analise} _anterior,
+                ) AS {coluna_analise}_anterior,
                 COALESCE (
                     {coluna_analise} - LAG({coluna_analise}, 1) OVER(
                         PARTITION BY id_canal
@@ -163,8 +199,8 @@ class Medida:
             FROM
                 estatisticas_canais ec
             WHERE
-                assunto = % s
-                AND id_canal = % s
+                assunto = %s
+                AND id_canal = %s
                 AND turno_extracao = 'Noite'
             ORDER BY
                 data_extracao ASC
@@ -176,7 +212,7 @@ class Medida:
             tipos = {
                 'data_extracao': 'string',
                 'dia_da_semana': 'string',
-                {coluna_analise}: 'int64',
+                coluna_analise: 'int64',
                 f'{coluna_analise}_dia': 'int64'
             }
 

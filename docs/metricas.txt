@@ -1,0 +1,20 @@
+1- # Total vísualizações/inscritos/videos_publicados turno canal
+
+
+ #2 - Total vísualizações/inscritos/videos_publicado por dia canal
+
+
+---------------------------
+# 3-  TOTAL Visualizações, total comentários e total_likes vídeo Turno 
+
+
+
+# 4 - Total Visualizações, total comentários e total_likes  vídeo dia 
+
+
+ 5 - Média da taxa de engajamento do vídeo por dia
+--------------------------------
+
+ ---- 6 -Média engajamento  do  canal por visualização
+--  7 - média taxa engajamento do canal por total de inscritos
+-- 8 Fequência de vídeos publicados por assunto
