@@ -223,36 +223,53 @@ class Medida:
             self.__Sessao.close()
         return dataframe
 
-    def obter_total_dados_video_turno(self, id_video: str, assunto: str):
+    def obter_total_dados_video_turno(self, id_video: str, assunto: str, coluna_analise: str):
         sql = f"""
             SELECT 
                 ev.turno_extracao AS turno_extracao,
+                regexp_replace(
+                    date_format(ev.data_extracao, 'EEEE'),
+                    'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+                    CASE
+                        date_format(data_extracao, 'EEEE')
+                        WHEN 'Monday' THEN 'Segunda-feira'
+                        WHEN 'Tuesday' THEN 'Terça-feira'
+                        WHEN 'Wednesday' THEN 'Quarta-feira'
+                        WHEN 'Thursday' THEN 'Quinta-feira'
+                        WHEN 'Friday' THEN 'Sexta-feira'
+                        WHEN 'Saturday' THEN 'Sábado'
+                        WHEN 'Sunday' THEN 'Domingo'
+                    END
+                ) as dia_semana,
             CASE 
                 WHEN COALESCE(
-                    ev.total_visualizacoes - 
-                    LAG(ev.total_visualizacoes, 1) OVER (PARTITION BY id_canal ORDER BY data_extracao), 
+                    ev.{coluna_analise} - 
+                    LAG(ev.{coluna_analise}, 1) OVER (PARTITION BY id_canal ORDER BY data_extracao), 
                     0
                 ) = 0
-                THEN ev.total_visualizacoes
+                THEN ev.{coluna_analise}
                 ELSE COALESCE(
-                    ev.total_visualizacoes - 
-                    LAG(ev.total_visualizacoes, 1) OVER (PARTITION BY id_canal ORDER BY data_extracao), 
+                    ev.{coluna_analise} - 
+                    LAG(ev.{coluna_analise}, 1) OVER (PARTITION BY id_canal ORDER BY data_extracao), 
                     0
                 )
-            END AS total_visualizacoes_turno
+            END AS {coluna_analise}_turno
         FROM 
             estatisticas_videos ev
         WHERE 
             ev.assunto =  %s
             AND ev.id_video =  %s
+            
 
     """
         parametros = (assunto, id_video)
+        print(sql)
+        print(parametros)
 
         try:
             tipos = {
                 'turno_extracao': 'string',
-                'total_visualizacoes_turno': 'int64',
+                f'{coluna_analise}_turno': 'int64',
 
             }
             dataframe = pd.read_sql_query(

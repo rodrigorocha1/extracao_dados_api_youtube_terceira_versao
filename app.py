@@ -117,20 +117,28 @@ def main():
         tab1, tab2, tab3 = st.tabs(
             ['Total vísualizações', 'Total Inscritos', 'Total Vídeo']
         )
-        with tab1:
 
-            st.write(
-                'Total Visualizações, total comentários e total_likes vídeo Turno '
-            )
-        with tab2:
-            st.write(
-                '  # 4 - Total Visualizações, total comentários e total_likes  vídeo dia'
-            )
+        with st.container():
+            with tab1:
 
-        with tab3:
-            st.write(
-                ' # 5 - Média da taxa de engajamento do vídeo por dia'
-            )
+                st.write(
+                    'Total Visualizações Turno '
+                )
+
+                coluna_analise = 'total_visualizacoes'
+                nome_video = dc.listar_video_assunto(
+                    assunto=assunto, chave_input=7)
+                dc.gerar_dados_videos(
+                    video=nome_video, assunto=assunto, flag=2, coluna_analise=coluna_analise)
+            with tab2:
+                st.write(
+                    ' total Likes Turno'
+                )
+
+            with tab3:
+                st.write(
+                    'total  Comentário Turno'
+                )
 
     with st.container():
         st.write('Análise Taxa engajamento')

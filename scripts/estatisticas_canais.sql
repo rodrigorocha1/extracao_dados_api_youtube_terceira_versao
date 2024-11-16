@@ -164,6 +164,20 @@ where assunto = ;
 
 SELECT
 	ev.turno_extracao AS turno_extracao,
+	regexp_replace(
+		date_format(ev.data_extracao, 'EEEE'),
+		'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
+		CASE
+			date_format(data_extracao, 'EEEE')
+			WHEN 'Monday' THEN 'Segunda-feira'
+			WHEN 'Tuesday' THEN 'Terça-feira'
+			WHEN 'Wednesday' THEN 'Quarta-feira'
+			WHEN 'Thursday' THEN 'Quinta-feira'
+			WHEN 'Friday' THEN 'Sexta-feira'
+			WHEN 'Saturday' THEN 'Sábado'
+			WHEN 'Sunday' THEN 'Domingo'
+		END
+	) as dia_semana,
 	CASE
 		WHEN COALESCE(
 			ev.total_visualizacoes - LAG(ev.total_visualizacoes, 1) OVER (
