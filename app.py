@@ -115,7 +115,7 @@ def main():
         st.write('Análise vídeo')
 
         tab1, tab2, tab3 = st.tabs(
-            ['Total vísualizações', 'Total Inscritos', 'Total Vídeo']
+            ['Total vísualizações', 'Total Likes', 'Total Comentários']
         )
 
         with st.container():
@@ -134,6 +134,11 @@ def main():
                 st.write(
                     ' total Likes Turno'
                 )
+                coluna_analise = 'total_visualizacoes'
+                nome_video = dc.listar_video_assunto(
+                    assunto=assunto, chave_input=8)
+                dc.gerar_dados_videos(
+                    video=nome_video, assunto=assunto, flag=2, coluna_analise=coluna_analise)
 
             with tab3:
                 st.write(
