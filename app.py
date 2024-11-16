@@ -144,6 +144,11 @@ def main():
                 st.write(
                     'total  Comentário Turno'
                 )
+                coluna_analise = 'total_comentarios'
+                nome_video = dc.listar_video_assunto(
+                    assunto=assunto, chave_input=9)
+                dc.gerar_dados_videos(
+                    video=nome_video, assunto=assunto, flag=2, coluna_analise=coluna_analise)
 
     with st.container():
         st.write('Análise Taxa engajamento')
