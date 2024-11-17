@@ -55,7 +55,7 @@ class Medida:
             self.__Sessao.close()
         return dataframe
 
-    def obter_depara_canal(self, assunto: str, flag: int = None, titulo: str = None, nm_canal: str = None):
+    def obter_depara_canal(self, assunto: str, flag: int = None, nm_canal: str = None):
         if flag == 1:
             sql = """
                 SELECT
