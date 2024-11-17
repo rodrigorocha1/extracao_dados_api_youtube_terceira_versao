@@ -76,9 +76,14 @@ class DashboardController:
 
     def gerar_dados_engajamneto_canal_total_inscritos(self, assunto: str, flag: int, canal: str):
         dataframe = self.__model.obter_depara_canal(
-            assunto=assunto, flag=flag, canal=canal
+            assunto=assunto, flag=flag, nm_canal=canal
         )
         ids_canal = dataframe['id_canal'].tolist()
+        dataframe = self.__model.obter_media_taxa_engajamento_canal_total_inscritos(
+            assunto=assunto, ids_canal=ids_canal)
+
+        self.__view.gerar_grafico_engajamento_canal_total_incritos(
+            dataframe=dataframe)
 
     def gerar_dados_engajamento_video(self):
         pass

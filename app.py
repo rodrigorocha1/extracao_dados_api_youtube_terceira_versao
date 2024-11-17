@@ -170,12 +170,17 @@ def main():
                 assunto=assunto, flag=2, canal=canais)
 
         with tab2:
-            pass
+            st.write('Média engajamento  do  canal por total de  inscritos')
+            canais = dc.listar_canais_assunto_multiplos(
+                assunto=assunto, chave_input=12)
+            dc.gerar_dados_engajamneto_canal_total_inscritos(
+                assunto=assunto, flag=2, canal=canais)
 
         with tab3:
             st.write('Taxa engajamento vídeo')
 
-            canal = dc.listar_canais_assunto(assunto=assunto, chave_input=13)
+            canais = dc.listar_canais_assunto_multiplos(
+                assunto=assunto, chave_input=13)
 
 
 main()

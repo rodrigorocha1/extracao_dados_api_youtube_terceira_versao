@@ -24,7 +24,7 @@ class Medida:
                 WHERE
                     assunto = %s
             """
-            parametros = (assunto,)  # Tupla com um único valor
+            parametros = (assunto,)
             tipos = {
                 'id_video': 'string',
                 'titulo_video': 'string'
@@ -290,74 +290,71 @@ class Medida:
         return dataframe
 
     def obter_media_taxa_engajamento_canal_total_inscritos(self, assunto: str, ids_canal: List[str]) -> pd.DataFrame:
-        id_canal = ', '.join(id_canal for id_canal in ids_canal)
-        parametros = (assunto, id_canal, assunto, id_canal)
+        ids_canal_placeholder = ', '.join(
+            ['%s'] * len(ids_canal)) if isinstance(ids_canal, list) else '%s'
+
+        parametros = (assunto, *ids_canal, assunto, *ids_canal)
 
         sql = f"""
             WITH canal_info AS (
-                SELECT
-                    ec.id_canal,
-                    ec.nm_canal,
+                SELECT 
+                    ec.id_canal, 
+                    ec.nm_canal, 
                     ec.total_inscritos
-                FROM
+                FROM 
                     estatisticas_canais ec
-                WHERE
+                WHERE 
                     ec.assunto = %s
-                    AND ec.id_canal IN (
-                        %s
-                    )
-            ),
+                    AND ec.id_canal IN ({ids_canal_placeholder})
+            ), 
             video_info AS (
-                SELECT
-                    ev.id_canal,
-                    ev.data_extracao,
+                SELECT 
+                    ev.id_canal, 
+                    ev.data_extracao, 
                     COALESCE(
-                        (ev.total_likes + ev.total_comentarios) / \
-                         NULLIF(ev.total_visualizacoes, 0) * 100,
+                        (ev.total_likes + ev.total_comentarios) / NULLIF(ev.total_visualizacoes, 0) * 100, 
                         0
                     ) AS taxa_engajamento,
                     COALESCE(
-                        (ev.total_likes + ev.total_comentarios) / \
-                         NULLIF(dcc.total_inscritos, 0) * 100,
+                        (ev.total_likes + ev.total_comentarios) / NULLIF(canal_info.total_inscritos, 0) * 100, 
                         0
                     ) AS taxa_engajamento_inscritos,
-                    CASE
-                        date_format(ev.data_extracao, 'EEEE')
-                        WHEN 'Monday' THEN 'Segunda-feira'
-                        WHEN 'Tuesday' THEN 'Terça-feira'
-                        WHEN 'Wednesday' THEN 'Quarta-feira'
-                        WHEN 'Thursday' THEN 'Quinta-feira'
-                        WHEN 'Friday' THEN 'Sexta-feira'
-                        WHEN 'Saturday' THEN 'Sábado'
-                        WHEN 'Sunday' THEN 'Domingo'
+                    CASE 
+                        WHEN date_format(ev.data_extracao, 'EEEE') = 'Monday' THEN 'Segunda-feira'
+                        WHEN date_format(ev.data_extracao, 'EEEE') = 'Tuesday' THEN 'Terça-feira'
+                        WHEN date_format(ev.data_extracao, 'EEEE') = 'Wednesday' THEN 'Quarta-feira'
+                        WHEN date_format(ev.data_extracao, 'EEEE') = 'Thursday' THEN 'Quinta-feira'
+                        WHEN date_format(ev.data_extracao, 'EEEE') = 'Friday' THEN 'Sexta-feira'
+                        WHEN date_format(ev.data_extracao, 'EEEE') = 'Saturday' THEN 'Sábado'
+                        WHEN date_format(ev.data_extracao, 'EEEE') = 'Sunday' THEN 'Domingo'
                     END AS dia_da_semana,
                     dayofweek(ev.data_extracao) AS dia_semana
-                FROM
+                FROM 
                     estatisticas_videos ev
-                    JOIN canal_info dcc ON ev.id_canal = dcc.id_canal
-                WHERE
-                    ev.assunto = %s
-                    AND ev.id_canal IN (
-                        %s
-                    )
+                JOIN 
+                    canal_info ON ev.id_canal = canal_info.id_canal
+                WHERE 
+                    ev.assunto = %s 
+                    AND ev.id_canal IN ({ids_canal_placeholder})
             )
-            SELECT
-                vi.id_canal,
-                ci.nm_canal,
-                vi.dia_da_semana,
-                vi.dia_semana,
+            SELECT 
+                vi.id_canal, 
+                ci.nm_canal, 
+                vi.dia_da_semana, 
+                vi.dia_semana, 
                 ROUND(AVG(vi.taxa_engajamento_inscritos), 2) AS media_taxa_engajamento
-            FROM
+            FROM 
                 video_info vi
-                JOIN canal_info ci ON vi.id_canal = ci.id_canal
-            GROUP BY
-                vi.id_canal,
-                ci.nm_canal,
-                vi.dia_da_semana,
+            JOIN 
+                canal_info ci ON vi.id_canal = ci.id_canal
+            GROUP BY 
+                vi.id_canal, 
+                ci.nm_canal, 
+                vi.dia_da_semana, 
                 vi.dia_semana
-            HAVING
+            HAVING 
                 AVG(vi.taxa_engajamento) > 0
-            ORDER BY
+            ORDER BY 
                 vi.dia_semana
 
 

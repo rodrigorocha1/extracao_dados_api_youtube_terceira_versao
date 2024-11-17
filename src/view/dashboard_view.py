@@ -27,3 +27,6 @@ class DashboardView:
 
     def gerar_grafico_engajamento_canal(self, dataframe: pd.DataFrame):
         st.dataframe(dataframe)
+
+    def gerar_grafico_engajamento_canal_total_incritos(self, dataframe: pd.DataFrame):
+        st.dataframe(dataframe)
