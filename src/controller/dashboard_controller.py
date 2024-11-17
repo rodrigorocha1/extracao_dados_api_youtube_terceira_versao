@@ -9,14 +9,16 @@ class DashboardController:
         self.__view = DashboardView()
 
     def listar_video_assunto(self, assunto: str, chave_input: int):
-        dataframe = self.__model.obter_depara_video(assunto=assunto, flag=1)
+        dataframe = self.__model.obter_depara_video(
+            assunto=assunto, flag=1, titulo_video=None)
         canais = self.__view.mostrar_input_video(
             chave_input=chave_input, dataframe=dataframe
         )
         return canais
 
     def listar_canais_assunto(self, assunto: str, chave_input: int):
-        dataframe = self.__model.obter_depara_canal(assunto=assunto, flag=1)
+        dataframe = self.__model.obter_depara_canal(
+            assunto=assunto, flag=1, nm_canal=None)
         canais = self.__view.mostrar_input_canal(
             dataframe, chave_input=chave_input,)
         return canais

@@ -1,6 +1,6 @@
 from src.config.conexao import ConexaoBancoHive
 from src.config.config_banco import Base
-from typing import List
+from typing import List, Optional, Sequence, Tuple
 import pandas as pd
 
 
@@ -12,50 +12,53 @@ class Medida:
         self.__Sessao = self.__db.obter_sessao()
         Base.metadata.create_all(self.__conexao)
 
-    def obter_depara_video(self, assunto: str, flag: int = None, titulo_video: str = None):
+    def obter_depara_video(self, assunto: str, flag: int, titulo_video: str) -> pd.DataFrame:
+        parametros: Sequence[Optional[str]]
 
         if flag == 1:
             sql = f"""
-                
-                    SELECT
-                        id_video,
-                        titulo_video
-                    from
-                        depara_video
-                    WHERE
-                        assunto = %s
+                SELECT
+                    id_video,
+                    titulo_video
+                FROM
+                    depara_video
+                WHERE
+                    assunto = %s
             """
-            parametros = (assunto, )
+            parametros = (assunto, None)
             tipos = {
                 'id_video': 'string',
                 'titulo_video': 'string'
             }
         else:
             sql = f"""
-                
-                    SELECT
-                        id_video
-                        
-                    from
-                        depara_video
-                    WHERE
-                        assunto = %s
-                        and titulo_video = %s
+                SELECT
+                    id_video
+                FROM
+                    depara_video
+                WHERE
+                    assunto = %s
+                    AND titulo_video = %s
             """
             tipos = {
                 'id_video': 'string'
             }
+
             parametros = (assunto, titulo_video)
 
         try:
 
+            parametros_processados = [
+                p if p is not None else '' for p in parametros]
+
             dataframe = pd.read_sql_query(
-                sql=sql, con=self.__conexao, dtype=tipos, params=parametros)
+                sql=sql, con=self.__conexao, dtype=tipos, params=tuple(parametros_processados))
         finally:
             self.__Sessao.close()
+
         return dataframe
 
-    def obter_depara_canal(self, assunto: str, flag: int = None, nm_canal: str | List = None):
+    def obter_depara_canal(self, assunto: str, flag: int, nm_canal: Optional[str]) -> pd.DataFrame:
 
         if flag == 1:
             sql = """
@@ -67,14 +70,20 @@ class Medida:
                 WHERE
                     assunto = %s
             """
-            parametros = (assunto,)
+            parametros: Tuple[str, ...] = (assunto,)
             tipos = {
                 'id_canal': 'string',
                 'nm_canal': 'string'
             }
         else:
-            canal_placeholder = ', '.join(
-                ['%s'] * len(nm_canal)) if isinstance(nm_canal, list) else '%s'
+            if isinstance(nm_canal, str) or nm_canal is None:
+                canal_placeholder = '%s'
+                parametros = (
+                    assunto, nm_canal) if nm_canal is not None else (assunto,)
+            else:
+
+                canal_placeholder = ', '.join(['%s'] * len(nm_canal))
+                parametros = (assunto, *nm_canal)
 
             sql = f"""
                 SELECT
@@ -85,8 +94,6 @@ class Medida:
                     assunto = %s
                     and nm_canal in  ({canal_placeholder})
             """
-            parametros = (
-                assunto, *(nm_canal if isinstance(nm_canal, list) else [nm_canal]))
 
             tipos = {
                 'id_canal': 'string'
@@ -106,7 +113,7 @@ class Medida:
 
     def obter_dados_canal_turno(self, assunto: str, id_canal: str, coluna_analise: str) -> pd.DataFrame:
         sql = f"""
-            
+
             SELECT
                 turno_extracao,
                 regexp_replace(
@@ -166,9 +173,9 @@ class Medida:
             self.__Sessao.close()
         return dataframe
 
-    def obter_dado_canal_dia(self, assunto: str, id_canal: str, coluna_analise: str):
+    def obter_dado_canal_dia(self, assunto: str, id_canal: str, coluna_analise: str) -> pd.DataFrame:
         sql = f"""
-            
+
             SELECT
                 data_extracao,
                 regexp_replace(
@@ -210,7 +217,7 @@ class Medida:
                 AND turno_extracao = 'Noite'
             ORDER BY
                 data_extracao ASC
-   
+
         """
 
         parametros = (assunto, id_canal)
@@ -229,9 +236,9 @@ class Medida:
             self.__Sessao.close()
         return dataframe
 
-    def obter_total_dados_video_turno(self, id_video: str, assunto: str, coluna_analise: str):
+    def obter_total_dados_video_turno(self, id_video: str, assunto: str, coluna_analise: str) -> pd.DataFrame:
         sql = f"""
-            SELECT 
+            SELECT
                 ev.turno_extracao AS turno_extracao,
                 regexp_replace(
                     date_format(ev.data_extracao, 'EEEE'),
@@ -247,25 +254,25 @@ class Medida:
                         WHEN 'Sunday' THEN 'Domingo'
                     END
                 ) as dia_semana,
-            CASE 
+            CASE
                 WHEN COALESCE(
-                    ev.{coluna_analise} - 
-                    LAG(ev.{coluna_analise}, 1) OVER (PARTITION BY id_canal ORDER BY data_extracao), 
+                    ev.{coluna_analise} -
+                    LAG(ev.{coluna_analise}, 1) OVER (PARTITION BY id_canal ORDER BY data_extracao),
                     0
                 ) = 0
                 THEN ev.{coluna_analise}
                 ELSE COALESCE(
-                    ev.{coluna_analise} - 
-                    LAG(ev.{coluna_analise}, 1) OVER (PARTITION BY id_canal ORDER BY data_extracao), 
+                    ev.{coluna_analise} -
+                    LAG(ev.{coluna_analise}, 1) OVER (PARTITION BY id_canal ORDER BY data_extracao),
                     0
                 )
             END AS {coluna_analise}_turno
-        FROM 
+        FROM
             estatisticas_videos ev
-        WHERE 
+        WHERE
             ev.assunto =  %s
             AND ev.id_video =  %s
-            
+
 
     """
         parametros = (assunto, id_video)
@@ -288,7 +295,7 @@ class Medida:
             self.__Sessao.close()
         return dataframe
 
-    def obter_media_taxa_engajamento_canal_total_inscritos(self, assunto: str, ids_canal: List[str]):
+    def obter_media_taxa_engajamento_canal_total_inscritos(self, assunto: str, ids_canal: List[str]) -> pd.DataFrame:
         id_canal = ', '.join(id_canal for id_canal in ids_canal)
         parametros = (assunto, id_canal, assunto, id_canal)
 
@@ -311,11 +318,13 @@ class Medida:
                     ev.id_canal,
                     ev.data_extracao,
                     COALESCE(
-                        (ev.total_likes + ev.total_comentarios) / NULLIF(ev.total_visualizacoes, 0) * 100,
+                        (ev.total_likes + ev.total_comentarios) / \
+                         NULLIF(ev.total_visualizacoes, 0) * 100,
                         0
                     ) AS taxa_engajamento,
                     COALESCE(
-                        (ev.total_likes + ev.total_comentarios) / NULLIF(dcc.total_inscritos, 0) * 100,
+                        (ev.total_likes + ev.total_comentarios) / \
+                         NULLIF(dcc.total_inscritos, 0) * 100,
                         0
                     ) AS taxa_engajamento_inscritos,
                     CASE
@@ -356,9 +365,9 @@ class Medida:
                 AVG(vi.taxa_engajamento) > 0
             ORDER BY
                 vi.dia_semana
-	
-	
-	
+
+
+
         """
 
         try:
@@ -380,15 +389,15 @@ class Medida:
 
         return dataframe
 
-    def obter_media_engajamento_canal(self, ids_canal: list, assunto: str):
+    def obter_media_engajamento_canal(self, ids_canal: List, assunto: str) -> pd.DataFrame:
 
         ids_canal_placeholder = ', '.join(
             ['%s'] * len(ids_canal)) if isinstance(ids_canal, list) else '%s'
 
         sql = f"""
-            SELECT   
+            SELECT
                 ev.id_canal as id_canal ,
-                dcc.nm_canal as nm_canal, 
+                dcc.nm_canal as nm_canal,
                 regexp_replace(
                     date_format(ev.data_extracao, 'EEEE'),
                     'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
@@ -404,13 +413,13 @@ class Medida:
                 ) AS dia_da_semana,
 
                 COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) as media_taxa_engajamento
-            from estatisticas_videos ev 
+            from estatisticas_videos ev
             INNER JOIN (
                 SELECT *
-                FROM depara_canais dc  
+                FROM depara_canais dc
                 WHERE dc.assunto = %s
                 AND dc.id_canal  in  ({ids_canal_placeholder})
-            ) dcc on dcc.id_canal = ev.id_canal 
+            ) dcc on dcc.id_canal = ev.id_canal
             where ev.assunto = %s
             AND ev.id_canal  in ({ids_canal_placeholder})
             GROUP  BY ev.id_canal ,dcc.nm_canal , regexp_replace(
@@ -427,13 +436,10 @@ class Medida:
                     END
                 ),dayofweek(ev.data_extracao)
             HAVING   COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) > 0
-            ORDER BY   	dayofweek(ev.data_extracao) 
+            ORDER BY   	dayofweek(ev.data_extracao)
     """
 
-        parametros = (assunto, ids_canal, assunto, ids_canal)
-
-        parametros = (
-            assunto, *(ids_canal), assunto, *(ids_canal))
+        parametros = (assunto, *ids_canal, assunto, *ids_canal)
         try:
 
             tipos = {
