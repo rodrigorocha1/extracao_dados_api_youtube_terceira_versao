@@ -58,10 +58,14 @@ class DashboardController:
 
         self.__view.gerar_grafico_video_turno(dataframe=dataframe)
 
-    def gerar_dados_engajamento_canal_visualizacao(self, assunto: str, flag: int, canal: str):
+    def gerar_dados_engajamento_canal_visualizacao(self, assunto: str, flag: int, canal: list):
+
         dataframe = self.__model.obter_depara_canal(
             assunto=assunto, flag=flag, nm_canal=canal)
+        print('Gerando datafame id canal')
+
         ids_canal = dataframe['id_canal'].tolist()
+
         dataframe = self.__model.obter_media_engajamento_canal(
             ids_canal=ids_canal, assunto=assunto)
 

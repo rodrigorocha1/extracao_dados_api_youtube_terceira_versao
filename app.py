@@ -163,14 +163,18 @@ def main():
 
         with tab1:
             st.write('Média engajamento  do  canal por visualização')
-            canal = dc.listar_canais_assunto_multiplos(
+            canais = dc.listar_canais_assunto_multiplos(
                 assunto=assunto, chave_input=11)
+
+            st.write(canais)
+
+            # canal = ', '.join(canal for canal in canais)
+
             dc.gerar_dados_engajamento_canal_visualizacao(
-                assunto=assunto, flag=2, canal=canal)
+                assunto=assunto, flag=2, canal=canais)
 
         with tab2:
-            st.write('Média taxa engajamento do canal por total de inscritos')
-            canal = dc.listar_canais_assunto(assunto=assunto, chave_input=12)
+            pass
 
         with tab3:
             st.write('Taxa engajamento vídeo')

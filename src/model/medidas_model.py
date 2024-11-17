@@ -55,7 +55,8 @@ class Medida:
             self.__Sessao.close()
         return dataframe
 
-    def obter_depara_canal(self, assunto: str, flag: int = None, nm_canal: str = None):
+    def obter_depara_canal(self, assunto: str, flag: int = None, nm_canal: str | List = None):
+
         if flag == 1:
             sql = """
                 SELECT
@@ -72,16 +73,21 @@ class Medida:
                 'nm_canal': 'string'
             }
         else:
-            sql = """
+            canal_placeholder = ', '.join(
+                ['%s'] * len(nm_canal)) if isinstance(nm_canal, list) else '%s'
+
+            sql = f"""
                 SELECT
                     id_canal
                 from
                     depara_canais
                 WHERE
                     assunto = %s
-                    and nm_canal in  (%s)
+                    and nm_canal in  ({canal_placeholder})
             """
-            parametros = (assunto, nm_canal)
+            parametros = (
+                assunto, *(nm_canal if isinstance(nm_canal, list) else [nm_canal]))
+
             tipos = {
                 'id_canal': 'string'
             }
@@ -374,9 +380,10 @@ class Medida:
 
         return dataframe
 
-    def obter_media_engajamento_canal(self, ids_canal: List[str], assunto: str):
+    def obter_media_engajamento_canal(self, ids_canal: list, assunto: str):
 
-        id_canal = ', '.join(id_canal for id_canal in ids_canal)
+        ids_canal_placeholder = ', '.join(
+            ['%s'] * len(ids_canal)) if isinstance(ids_canal, list) else '%s'
 
         sql = f"""
             SELECT   
@@ -402,10 +409,10 @@ class Medida:
                 SELECT *
                 FROM depara_canais dc  
                 WHERE dc.assunto = %s
-                AND dc.id_canal  in  (%s)
+                AND dc.id_canal  in  ({ids_canal_placeholder})
             ) dcc on dcc.id_canal = ev.id_canal 
             where ev.assunto = %s
-            AND ev.id_canal  in (%s)
+            AND ev.id_canal  in ({ids_canal_placeholder})
             GROUP  BY ev.id_canal ,dcc.nm_canal , regexp_replace(
                     date_format(ev.data_extracao, 'EEEE'),
                     'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
@@ -423,7 +430,10 @@ class Medida:
             ORDER BY   	dayofweek(ev.data_extracao) 
     """
 
-        parametros = (assunto, id_canal, assunto, id_canal)
+        parametros = (assunto, ids_canal, assunto, ids_canal)
+
+        parametros = (
+            assunto, *(ids_canal), assunto, *(ids_canal))
         try:
 
             tipos = {
