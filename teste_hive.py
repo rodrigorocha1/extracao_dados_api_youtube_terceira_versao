@@ -1,4 +1,3 @@
-placeholders = ', '.join([':id_video_' + str(i)
-                          for i in range(len(['a, b']))])
+**a, b = [1, 2, 3]
 
-print(placeholders)
+print(a)

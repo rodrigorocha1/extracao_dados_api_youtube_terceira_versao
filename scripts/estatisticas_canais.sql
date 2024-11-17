@@ -768,3 +768,5 @@ SELECT
 
 
 
+-------------------
+SELECT data_extracao, regexp_replace( date_format(data_extracao, 'EEEE'), 'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday', CASE date_format(data_extracao, 'EEEE') WHEN 'Monday' THEN 'Segunda-feira' WHEN 'Tuesday' THEN 'Terça-feira' WHEN 'Wednesday' THEN 'Quarta-feira' WHEN 'Thursday' THEN 'Quinta-feira' WHEN 'Friday' THEN 'Sexta-feira' WHEN 'Saturday' THEN 'Sábado' WHEN 'Sunday' THEN 'Domingo' END ) AS dia_da_semana, total_visualizacoes, COALESCE ( LAG(total_visualizacoes, 1) OVER( PARTITION BY id_canal ORDER BY data_extracao ), 0 ) AS total_visualizacoes_anterior, COALESCE ( total_visualizacoes - LAG(total_visualizacoes, 1) OVER( PARTITION BY id_canal ORDER BY data_extracao ), 0 ) as total_visualizacoes_dia FROM estatisticas_canais ec WHERE assunto = 'Linux' AND id_canal = 'UCbqbbDSvjo4kmwIITnXbJag' AND turno_extracao = 'Noite' ORDER BY data_extracao ASC

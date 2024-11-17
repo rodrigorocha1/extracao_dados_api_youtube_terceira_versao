@@ -22,6 +22,13 @@ class DashboardController:
             dataframe, chave_input=chave_input,)
         return canais
 
+    def listar_canais_assunto_multiplos(self, assunto: str, chave_input: int):
+        dataframe = self.__model.obter_depara_canal(assunto=assunto, flag=1)
+        print(dataframe)
+        canais = self.__view.mostrar_input_canal_multiplos(
+            dataframe, chave_input=chave_input,)
+        return canais
+
     def gerar_dados_total_por_canal_turno(self, canal: str, assunto: str,
                                           flag: int, coluna_analise: str):
 
@@ -47,8 +54,26 @@ class DashboardController:
             assunto=assunto, flag=flag, titulo_video=video)
         id_video = dataframe['id_video'].to_string().split(
             ' ')[-1].strip()
-        print(id_video, dataframe)
+
         dataframe = self.__model.obter_total_dados_video_turno(
             assunto=assunto, id_video=id_video, coluna_analise=coluna_analise)
 
         self.__view.gerar_grafico_video_turno(dataframe=dataframe)
+
+    def gerar_dados_engajamento_canal_visualizacao(self, assunto: str, flag: int, canal: str):
+        dataframe = self.__model.obter_depara_canal(
+            assunto=assunto, flag=flag, nm_canal=canal)
+        ids_canal = dataframe['id_canal'].tolist()
+        dataframe = self.__model.obter_media_engajamento_canal(
+            ids_canal=ids_canal, assunto=assunto)
+        print(ids_canal, assunto)
+        self.__view.gerar_grafico_engajamento_canal(dataframe)
+
+    def gerar_dados_engajamneto_canal_total_inscritos(self, assunto: str, flag: int, canal: str):
+        dataframe = self.__model.obter_depara_canal(
+            assunto=assunto, flag=flag, canal=canal
+        )
+        ids_canal = dataframe['id_canal'].tolist()
+
+    def gerar_dados_engajamento_video(self):
+        pass

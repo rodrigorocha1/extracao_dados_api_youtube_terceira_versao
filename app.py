@@ -153,13 +153,29 @@ def main():
     with st.container():
         st.write('Análise Taxa engajamento')
 
-        col1, col2 = st.columns(2)
+        tab1, tab2, tab3 = st.tabs(
+            [
+                'Média engajamento canal vísualização',
+                'Média engajamento total inscritos ',
+                'Média engajamento vídeo'
+            ]
+        )
 
-        with col1:
-            st.write(' -Média engajamento  do  canal por visualização')
+        with tab1:
+            st.write('Média engajamento  do  canal por visualização')
+            canal = dc.listar_canais_assunto_multiplos(
+                assunto=assunto, chave_input=11)
+            dc.gerar_dados_engajamento_canal_visualizacao(
+                assunto=assunto, flag=2, canal=canal)
 
-        with col2:
-            st.write('8 Fequência de vídeos publicados por assunto')
+        with tab2:
+            st.write('Média taxa engajamento do canal por total de inscritos')
+            canal = dc.listar_canais_assunto(assunto=assunto, chave_input=12)
+
+        with tab3:
+            st.write('Taxa engajamento vídeo')
+
+            canal = dc.listar_canais_assunto(assunto=assunto, chave_input=13)
 
 
 main()

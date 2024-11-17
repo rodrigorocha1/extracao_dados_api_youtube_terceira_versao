@@ -79,7 +79,7 @@ class Medida:
                     depara_canais
                 WHERE
                     assunto = %s
-                    and nm_canal= %s
+                    and nm_canal in  (%s)
             """
             parametros = (assunto, nm_canal)
             tipos = {
@@ -263,8 +263,6 @@ class Medida:
 
     """
         parametros = (assunto, id_video)
-        print(sql)
-        print(parametros)
 
         try:
             tipos = {
@@ -284,13 +282,106 @@ class Medida:
             self.__Sessao.close()
         return dataframe
 
-    def obter_media_taxa_engajamento_dia(self, assunto: str, ids_video: List[str]):
-        placeholders = ', '.join(
-            [f":id_video_{i}" for i in range(len(ids_video))])
+    def obter_media_taxa_engajamento_canal_total_inscritos(self, assunto: str, ids_canal: List[str]):
+        id_canal = ', '.join(id_canal for id_canal in ids_canal)
+        parametros = (assunto, id_canal, assunto, id_canal)
+
+        sql = f"""
+            WITH canal_info AS (
+                SELECT
+                    ec.id_canal,
+                    ec.nm_canal,
+                    ec.total_inscritos
+                FROM
+                    estatisticas_canais ec
+                WHERE
+                    ec.assunto = %s
+                    AND ec.id_canal IN (
+                        %s
+                    )
+            ),
+            video_info AS (
+                SELECT
+                    ev.id_canal,
+                    ev.data_extracao,
+                    COALESCE(
+                        (ev.total_likes + ev.total_comentarios) / NULLIF(ev.total_visualizacoes, 0) * 100,
+                        0
+                    ) AS taxa_engajamento,
+                    COALESCE(
+                        (ev.total_likes + ev.total_comentarios) / NULLIF(dcc.total_inscritos, 0) * 100,
+                        0
+                    ) AS taxa_engajamento_inscritos,
+                    CASE
+                        date_format(ev.data_extracao, 'EEEE')
+                        WHEN 'Monday' THEN 'Segunda-feira'
+                        WHEN 'Tuesday' THEN 'Terça-feira'
+                        WHEN 'Wednesday' THEN 'Quarta-feira'
+                        WHEN 'Thursday' THEN 'Quinta-feira'
+                        WHEN 'Friday' THEN 'Sexta-feira'
+                        WHEN 'Saturday' THEN 'Sábado'
+                        WHEN 'Sunday' THEN 'Domingo'
+                    END AS dia_da_semana,
+                    dayofweek(ev.data_extracao) AS dia_semana
+                FROM
+                    estatisticas_videos ev
+                    JOIN canal_info dcc ON ev.id_canal = dcc.id_canal
+                WHERE
+                    ev.assunto = %s
+                    AND ev.id_canal IN (
+                        %s
+                    )
+            )
+            SELECT
+                vi.id_canal,
+                ci.nm_canal,
+                vi.dia_da_semana,
+                vi.dia_semana,
+                ROUND(AVG(vi.taxa_engajamento_inscritos), 2) AS media_taxa_engajamento
+            FROM
+                video_info vi
+                JOIN canal_info ci ON vi.id_canal = ci.id_canal
+            GROUP BY
+                vi.id_canal,
+                ci.nm_canal,
+                vi.dia_da_semana,
+                vi.dia_semana
+            HAVING
+                AVG(vi.taxa_engajamento) > 0
+            ORDER BY
+                vi.dia_semana
+	
+	
+	
+        """
+
+        try:
+
+            tipos = {
+                'id_canal': 'string',
+                'nm_canal': 'string',
+                'dia_da_semana': 'string',
+                'media_taxa_engajamento': 'float64'
+
+            }
+
+            dataframe = pd.read_sql_query(
+                sql=sql, con=self.__conexao, params=parametros, dtype=tipos)
+
+        finally:
+
+            self.__Sessao.close()
+
+        return dataframe
+
+    def obter_media_engajamento_canal(self, ids_canal: List[str], assunto: str):
+
+        id_canal = ', '.join(id_canal for id_canal in ids_canal)
+
         sql = f"""
             SELECT   
-                ev.id_video as id_video,
-                dvv.titulo_video as titulo_video, 
+                ev.id_canal as id_canal ,
+                dcc.nm_canal as nm_canal, 
                 regexp_replace(
                     date_format(ev.data_extracao, 'EEEE'),
                     'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
@@ -303,19 +394,19 @@ class Medida:
                         WHEN 'Saturday' THEN 'Sábado'
                         WHEN 'Sunday' THEN 'Domingo'
                     END
-                ) AS dia_da_semana ,
+                ) AS dia_da_semana,
 
                 COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) as media_taxa_engajamento
             from estatisticas_videos ev 
             INNER JOIN (
                 SELECT *
-                FROM depara_video dv 
-                WHERE dv.assunto = :assunto
-                AND dv.id_video  IN ({placeholders})
-            ) dvv on dvv.id_video = ev.id_video
-            where ev.assunto = :assunto
-            AND ev.id_video  IN ({placeholders})
-            GROUP  BY ev.id_video , dvv.titulo_video , regexp_replace(
+                FROM depara_canais dc  
+                WHERE dc.assunto = %s
+                AND dc.id_canal  in  (%s)
+            ) dcc on dcc.id_canal = ev.id_canal 
+            where ev.assunto = %s
+            AND ev.id_canal  in (%s)
+            GROUP  BY ev.id_canal ,dcc.nm_canal , regexp_replace(
                     date_format(ev.data_extracao, 'EEEE'),
                     'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
                     CASE date_format(data_extracao, 'EEEE')
@@ -327,88 +418,17 @@ class Medida:
                         WHEN 'Saturday' THEN 'Sábado'
                         WHEN 'Sunday' THEN 'Domingo'
                     END
-                ) , dayofweek(ev.data_extracao) 
+                ),dayofweek(ev.data_extracao)
             HAVING   COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) > 0
-            ORDER BY   dayofweek(ev.data_extracao)
-        """
-
-        parametros = {'assunto': assunto}
-        for i, id_video in enumerate(ids_video):
-            parametros[f'id_video_{i}'] = id_video
-
-        try:
-            tipos = {
-                'id_video': 'string',
-                'titulo_video': 'string',
-                'dia_da_semana': 'string',
-                'media_taxa_engajamento': 'float64'
-
-            }
-            dataframe = pd.read_sql_query(
-                sql=sql, con=self.__conexao, params=parametros, dtype=tipos)
-
-        finally:
-            self.__Sessao.close()
-        return dataframe
-
-    def obter_media_engajamento_canal(self, ids_canal: List[str], assunto: str):
-
-        placeholders = ', '.join(
-            [f":id_video_{i}" for i in range(len(ids_canal))])
-        sql = f"""
-        SELECT   
-            ev.id_canal as id_canal ,
-            dcc.nm_canal as nm_canal, 
-            regexp_replace(
-                date_format(ev.data_extracao, 'EEEE'),
-                'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
-                CASE date_format(data_extracao, 'EEEE')
-                    WHEN 'Monday' THEN 'Segunda-feira'
-                    WHEN 'Tuesday' THEN 'Terça-feira'
-                    WHEN 'Wednesday' THEN 'Quarta-feira'
-                    WHEN 'Thursday' THEN 'Quinta-feira'
-                    WHEN 'Friday' THEN 'Sexta-feira'
-                    WHEN 'Saturday' THEN 'Sábado'
-                    WHEN 'Sunday' THEN 'Domingo'
-                END
-            ) AS dia_da_semana,
-
-            COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) as media_taxa_engajamento
-        from estatisticas_videos ev 
-        INNER JOIN (
-            SELECT *
-            FROM depara_canais dc  
-            WHERE dc.assunto = '{assunto}' 
-            AND dc.id_canal  in ({placeholders})
-        ) dcc on dcc.id_canal = ev.id_canal 
-        where ev.assunto = '{assunto}' 
-        AND ev.id_canal  in ({placeholders})
-        GROUP  BY ev.id_canal ,dcc.nm_canal , regexp_replace(
-                date_format(ev.data_extracao, 'EEEE'),
-                'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday',
-                CASE date_format(data_extracao, 'EEEE')
-                    WHEN 'Monday' THEN 'Segunda-feira'
-                    WHEN 'Tuesday' THEN 'Terça-feira'
-                    WHEN 'Wednesday' THEN 'Quarta-feira'
-                    WHEN 'Thursday' THEN 'Quinta-feira'
-                    WHEN 'Friday' THEN 'Sexta-feira'
-                    WHEN 'Saturday' THEN 'Sábado'
-                    WHEN 'Sunday' THEN 'Domingo'
-                END
-            ),dayofweek(ev.data_extracao)
-        HAVING   COALESCE(ROUND(AVG(((ev.total_likes + ev.total_comentarios ) / ev.total_visualizacoes) * 100), 2), 0) > 0
-        ORDER BY   	dayofweek(ev.data_extracao) 
+            ORDER BY   	dayofweek(ev.data_extracao) 
     """
 
-        parametros = {'assunto': assunto}
-        for i, id_canal in enumerate(ids_canal):
-            parametros[f'id_video_{i}'] = id_canal
-
+        parametros = (assunto, id_canal, assunto, id_canal)
         try:
 
             tipos = {
-                'id_video': 'string',
-                'titulo_video': 'string',
+                'id_canal': 'string',
+                'nm_canal': 'string',
                 'dia_da_semana': 'string',
                 'media_taxa_engajamento': 'float64'
 
