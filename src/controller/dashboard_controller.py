@@ -24,7 +24,6 @@ class DashboardController:
 
     def listar_canais_assunto_multiplos(self, assunto: str, chave_input: int):
         dataframe = self.__model.obter_depara_canal(assunto=assunto, flag=1)
-        print(dataframe)
         canais = self.__view.mostrar_input_canal_multiplos(
             dataframe, chave_input=chave_input,)
         return canais
