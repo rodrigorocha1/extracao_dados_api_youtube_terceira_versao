@@ -1,6 +1,5 @@
 from src.model.medidas_model import Medida
 from src.view.dashboard_view import DashboardView
-import streamlit as st
 
 
 class DashboardController:
@@ -65,7 +64,7 @@ class DashboardController:
         ids_canal = dataframe['id_canal'].tolist()
         dataframe = self.__model.obter_media_engajamento_canal(
             ids_canal=ids_canal, assunto=assunto)
-        print(ids_canal, assunto)
+
         self.__view.gerar_grafico_engajamento_canal(dataframe)
 
     def gerar_dados_engajamneto_canal_total_inscritos(self, assunto: str, flag: int, canal: str):
