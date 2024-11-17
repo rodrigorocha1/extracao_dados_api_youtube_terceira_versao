@@ -166,10 +166,6 @@ def main():
             canais = dc.listar_canais_assunto_multiplos(
                 assunto=assunto, chave_input=11)
 
-            st.write(canais)
-
-            # canal = ', '.join(canal for canal in canais)
-
             dc.gerar_dados_engajamento_canal_visualizacao(
                 assunto=assunto, flag=2, canal=canais)
 

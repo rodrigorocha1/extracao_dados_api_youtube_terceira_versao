@@ -13,8 +13,7 @@ class Medida:
         Base.metadata.create_all(self.__conexao)
 
     def obter_depara_video(self, assunto: str, flag: int, titulo_video: str) -> pd.DataFrame:
-        parametros: Sequence[Optional[str]]
-
+        parametros: Tuple[str, ...]
         if flag == 1:
             sql = f"""
                 SELECT
@@ -25,7 +24,7 @@ class Medida:
                 WHERE
                     assunto = %s
             """
-            parametros = (assunto, None)
+            parametros = (assunto,)  # Tupla com um único valor
             tipos = {
                 'id_video': 'string',
                 'titulo_video': 'string'
@@ -43,16 +42,11 @@ class Medida:
             tipos = {
                 'id_video': 'string'
             }
-
             parametros = (assunto, titulo_video)
 
         try:
-
-            parametros_processados = [
-                p if p is not None else '' for p in parametros]
-
             dataframe = pd.read_sql_query(
-                sql=sql, con=self.__conexao, dtype=tipos, params=tuple(parametros_processados))
+                sql=sql, con=self.__conexao, dtype=tipos, params=parametros)
         finally:
             self.__Sessao.close()
 
