@@ -30,6 +30,15 @@ class DashboardController:
             dataframe, chave_input=chave_input,)
         return canais
 
+    def listar_videos_assunto_multiplos(self, assunto: str, chave_input: int, canal: str):
+        dataframe = self.__model.obter_depara_canal(
+            assunto=assunto, flag=2, nm_canal=canal)
+        id_canal = dataframe['id_canal'].to_string().split(' ')[-1]
+        lista_videos = self.__model.obter_depara_video(
+            assunto=assunto, flag=3, titulo_video=None, id_canal=id_canal)
+        return self.__view.mostrar_input_videos_multiplos(
+            dataframe=lista_videos, chave_input=chave_input)
+
     def gerar_dados_total_por_canal_turno(self, canal: str, assunto: str,
                                           flag: int, coluna_analise: str):
 
@@ -65,7 +74,6 @@ class DashboardController:
 
         dataframe = self.__model.obter_depara_canal(
             assunto=assunto, flag=flag, nm_canal=canal)
-        print('Gerando datafame id canal')
 
         ids_canal = dataframe['id_canal'].tolist()
 

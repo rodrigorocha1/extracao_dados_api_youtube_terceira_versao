@@ -12,7 +12,7 @@ class Medida:
         self.__Sessao = self.__db.obter_sessao()
         Base.metadata.create_all(self.__conexao)
 
-    def obter_depara_video(self, assunto: str, flag: int, titulo_video: str) -> pd.DataFrame:
+    def obter_depara_video(self, assunto: str, flag: int, titulo_video: str, id_canal: str = None) -> pd.DataFrame:
         parametros: Tuple[str, ...]
         if flag == 1:
             sql = f"""
@@ -29,20 +29,31 @@ class Medida:
                 'id_video': 'string',
                 'titulo_video': 'string'
             }
-        else:
+        elif flag == 2:
             sql = f"""
-                SELECT
-                    id_video
-                FROM
-                    depara_video
-                WHERE
-                    assunto = %s
-                    AND titulo_video = %s
+               SELECT  
+                    titulo_video 
+                from depara_video
+                WHERE id_canal =  %s
             """
             tipos = {
                 'id_video': 'string'
             }
             parametros = (assunto, titulo_video)
+        else:
+            sql = f"""
+                SELECT
+                    titulo_video
+                FROM
+                    depara_video
+                WHERE
+                    assunto = %s
+                    AND id_canal = %s
+            """
+            tipos = {
+                'titulo_video': 'string'
+            }
+            parametros = (assunto, id_canal)
 
         try:
             dataframe = pd.read_sql_query(

@@ -12,6 +12,10 @@ class DashboardView:
         return st.multiselect('Escolha o canal',
                               dataframe['nm_canal'].to_list(), dataframe['nm_canal'].to_list()[0], key=chave_input)
 
+    def mostrar_input_videos_multiplos(self, dataframe: pd.DataFrame, chave_input: int):
+        return st.multiselect('Escolha o canal',
+                              dataframe['titulo_video'].to_list(), dataframe['titulo_video'].to_list()[0], key=chave_input)
+
     def mostrar_input_video(self, dataframe: pd.DataFrame, chave_input: int):
         return st.selectbox('Escolha o video',
                             dataframe['titulo_video'].to_list(), key=chave_input)
