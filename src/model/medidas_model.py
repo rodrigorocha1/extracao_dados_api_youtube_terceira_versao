@@ -32,9 +32,10 @@ class Medida:
         elif flag == 2:
             sql = f"""
                SELECT  
-                    titulo_video 
+                    id_video
                 from depara_video
-                WHERE id_canal =  %s
+                WHERE  assunto = %s
+                and titulo_video =  %s
             """
             tipos = {
                 'id_video': 'string'

@@ -62,6 +62,7 @@ class DashboardController:
     def gerar_dados_videos(self, video: str, assunto: str, flag: int, coluna_analise: str):
         dataframe = self.__model.obter_depara_video(
             assunto=assunto, flag=flag, titulo_video=video)
+        print(dataframe)
         id_video = dataframe['id_video'].to_string().split(
             ' ')[-1].strip()
 
