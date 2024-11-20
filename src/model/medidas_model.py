@@ -80,7 +80,7 @@ class Medida:
 
         Args:
             assunto (str): assunto de pesquisa
-            flag (int): flag de direcionamento 1 - assunto 2 - assunto e nome canal
+            flag (int): flag de direcionamento 1 - assunto/2 - assunto e nome canal/ 
             nm_canal (Optional[str]): nome do canal 
 
         Returns:
@@ -124,7 +124,7 @@ class Medida:
             tipos = {
                 'id_canal': 'string'
             }
-
+        print(sql % parametros)
         try:
 
             dataframe = pd.read_sql_query(

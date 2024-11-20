@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from src.controller.dashboard_controller import DashboardController
+from src.view.figura_view import FiguraView
 
 
 class DashboardView:
@@ -9,6 +10,7 @@ class DashboardView:
 
     def __init__(self):
         self.__controller = DashboardController()
+        self.__figura_view = FiguraView()
 
     def gerar_layout_assunto(self):
         with st.container():
@@ -64,9 +66,48 @@ class DashboardView:
                     canais = st.selectbox(
                         'selecione o canal',
                         input_canais,
-                        placeholder='selecione os canais'
-
+                        placeholder='selecione os canais',
+                        key=1
                     )
+
+                    dataframe = self.__controller.gerar_resultado_total_canais_turno(
+                        assunto=assunto, coluna_analise=coluna_analise, nome_canal=canais)
+
+                    self.__figura_view.gerar_grafico_total_por_canal_turno(
+                        dataframe=dataframe)
+                with tab2:
+                    st.write('Total Inscritos')
+                    coluna_analise = 'total_inscritos'
+                    input_canais = self.__controller.listar_canais_assunto(
+                        assunto=assunto)
+                    canais = st.selectbox(
+                        'selecione o canal',
+                        input_canais,
+                        placeholder='selecione os canais',
+                        key=2
+                    )
+
+                    dataframe = self.__controller.gerar_resultado_total_canais_turno(
+                        assunto=assunto, coluna_analise=coluna_analise, nome_canal=canais)
+
+                    self.__figura_view.gerar_grafico_total_por_canal_turno(
+                        dataframe=dataframe)
+                with tab3:
+                    st.write('Total Vídeo')
+                    coluna_analise = 'total_videos_publicados'
+                    input_canais = self.__controller.listar_canais_assunto(
+                        assunto=assunto)
+                    canais = st.selectbox(
+                        'selecione o canal',
+                        input_canais,
+                        placeholder='selecione os canais',
+                        key=3
+                    )
+                    dataframe = self.__controller.gerar_resultado_total_canais_turno(
+                        assunto=assunto, coluna_analise=coluna_analise, nome_canal=canais)
+
+                    self.__figura_view.gerar_grafico_total_por_canal_turno(
+                        dataframe=dataframe)
 
     def rodar_dashboard(self):
         assunto = self.gerar_layout_assunto()
