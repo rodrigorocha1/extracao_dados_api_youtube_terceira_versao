@@ -69,7 +69,6 @@ class Medida:
             tipos = {
                 'titulo_video': 'string'
             }
-            print(sql % parametros)
 
         try:
             dataframe = pd.read_sql_query(
@@ -128,7 +127,7 @@ class Medida:
             tipos = {
                 'id_canal': 'string'
             }
-        print(sql % parametros)
+
         try:
 
             dataframe = pd.read_sql_query(
