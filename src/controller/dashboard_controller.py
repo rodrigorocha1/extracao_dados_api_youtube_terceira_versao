@@ -58,3 +58,9 @@ class DashboardController:
             assunto=assunto, flag=1, nm_canal=None)
         lista_canais = lista_canais['nm_canal'].to_list()
         return lista_canais
+
+    def listar_video_assunto(self, assunto: str) -> Tuple[str]:
+        dataframe = self.__model.obter_depara_video(
+            assunto=assunto, flag=1, titulo_video=None, id_canal=None)
+        canais = tuple(dataframe['titulo_video'].tolist())
+        return canais
