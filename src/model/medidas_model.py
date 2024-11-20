@@ -13,8 +13,8 @@ class Medida:
         Base.metadata.create_all(self.__conexao)
 
     def obter_depara_video(self, assunto: str,
-                           flag: int, titulo_video: str,
-                           id_canal: Union[Optional[str], List[str]] = None) -> pd.DataFrame:
+                           flag: int, titulo_video: Union[str, List[str]],
+                           id_canal: Union[Optional[str], List[str]] = None, id_video: List[str] = None) -> pd.DataFrame:
         """Método para obter os dados do vídeo      
 
         Args:
@@ -54,7 +54,7 @@ class Medida:
                 'id_video': 'string'
             }
             parametros = (assunto, titulo_video)
-        else:
+        elif flag == 3:
             canal_placeholder = ', '.join(['%s'] * len(id_canal))
             parametros = (assunto, *id_canal)
             sql = f"""
@@ -68,6 +68,21 @@ class Medida:
             """
             tipos = {
                 'titulo_video': 'string'
+            }
+        else:
+            video_placeholder = ', '.join(['%s'] * len(titulo_video))
+            parametros = (assunto, *titulo_video)
+            sql = f"""
+                SELECT
+                    id_video
+                FROM
+                    depara_video
+                WHERE
+                    assunto = %s
+                    AND titulo_video IN ({video_placeholder})
+            """
+            tipos = {
+                'id_video': 'string'
             }
 
         try:
@@ -545,73 +560,33 @@ class Medida:
         video_placeholder = ', '.join(['%s'] * len(id_video))
         parametros = (assunto, *id_video)
         sql = f"""
-            WITH engajamento_dia AS (
-                SELECT 
-                    ev.titulo_video,
-                    ev.data_extracao,
-                    ev.turno_extracao,
-                    ev.total_likes,
-                    ev.total_comentarios,
-                    ev.total_visualizacoes,
-                    COALESCE(
-                    (ev.total_likes + ev.total_comentarios) / NULLIF(ev.total_visualizacoes, 0) * 100, 
-                    0
-                    ) AS taxa_engajamento_total,
-                    -- Calcula as diferenças diárias utilizando LAG
-                    LAG(ev.total_likes) OVER (
-                    PARTITION BY ev.id_video 
-                    ORDER BY ev.data_extracao
-                    ) AS likes_anteriores,
-                    LAG(ev.total_comentarios) OVER (
-                    PARTITION BY ev.id_video 
-                    ORDER BY ev.data_extracao
-                    ) AS comentarios_anteriores,
-                    LAG(ev.total_visualizacoes) OVER (
-                    PARTITION BY ev.id_video 
-                    ORDER BY ev.data_extracao
-                    ) AS visualizacoes_anteriores
-                FROM 
-                    estatisticas_videos ev
-                WHERE 
-                    ev.assunto = %s
-                    AND ev.id_video IN ({video_placeholder})
-                    and ev.turno_extracao = 'Noite'
-                )
-
-                SELECT 
-                titulo_video,
-                CASE date_format(data_extracao, 'EEEE')
-                            WHEN 'Monday' THEN 'Segunda-feira'
-                            WHEN 'Tuesday' THEN 'Terça-feira'
-                            WHEN 'Wednesday' THEN 'Quarta-feira'
-                            WHEN 'Thursday' THEN 'Quinta-feira'
-                            WHEN 'Friday' THEN 'Sexta-feira'
-                            WHEN 'Saturday' THEN 'Sábado'
-                            WHEN 'Sunday' THEN 'Domingo'
-                        END as dia,
-
+            SELECT 
+                ev.titulo_video, 
+                ev.turno_extracao, 
+                ev.data_extracao, 
                 COALESCE(
-                    ((total_likes - likes_anteriores) + (total_comentarios - comentarios_anteriores)) / 
-                    NULLIF((total_visualizacoes - visualizacoes_anteriores), 0) * 100,
+                    (
+                    ev.total_likes + ev.total_comentarios
+                    ) / NULLIF(ev.total_visualizacoes, 0) * 100, 
                     0
-                ) AS taxa_engajamento_dia
-                FROM 
-                engajamento_dia
-                WHERE COALESCE(
-                    ((total_likes - likes_anteriores) + (total_comentarios - comentarios_anteriores)) / 
-                    NULLIF((total_visualizacoes - visualizacoes_anteriores), 0) * 100,
-                    0
-                )  > 0
-                ORDER BY 
-                data_extracao
+                ) AS taxa_engajamento
 
+            FROM 
+                estatisticas_videos ev 
+            WHERE 
+            ev.assunto = %s
+            AND ev.id_video IN ({video_placeholder})
+            AND ev.turno_extracao = 'Noite' 
+            ORDER BY 
+                ev.data_extracao
         """
 
         try:
             tipos = {
                 "titulo_video": "string",
-                "dia": "string",
-                "taxa_engajamento_dia": "string"
+                "turno_extracao": "string",
+                "data_extracao": "string",
+                "taxa_engajamento": "float64"
 
             }
 
@@ -621,6 +596,15 @@ class Medida:
                 dtype=tipos,
                 params=parametros
             )
+
+            dataframe['data_extracao'] = pd.to_datetime(
+                dataframe['data_extracao'])
+
+            dataframe['TAXA_ENGAJAMENTO_DESLOCADO'] = dataframe['taxa_engajamento'].shift(
+                1)
+            dataframe.dropna(inplace=True)
+            dataframe['TAXA_ENGAJAMENTO_DIA'] = dataframe['taxa_engajamento'] - \
+                dataframe['TAXA_ENGAJAMENTO_DESLOCADO']
         finally:
             self.__Sessao.close()
         return dataframe

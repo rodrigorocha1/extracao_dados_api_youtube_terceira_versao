@@ -307,7 +307,11 @@ class DashboardView:
                     key=16
                 )
 
-                # dataframe = self.__controller.gerar_layout_taxa_engajamento_video
+                dataframe = self.__controller.gerar_resultado_engajamento_videos(
+                    assunto=assunto, lista_videos=nome_videos)
+
+                self.__figura_view.gerar_grafico_taxa_engajamento_visualizacao(
+                    dataframe=dataframe)
 
     def rodar_dashboard(self):
         assunto = self.gerar_layout_assunto()
