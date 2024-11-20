@@ -64,3 +64,57 @@ class DashboardController:
             assunto=assunto, flag=1, titulo_video=None, id_canal=None)
         canais = tuple(dataframe['titulo_video'].tolist())
         return canais
+
+    def listar_canal_video_assunto(self, assunto: str, nome_canal: str) -> Tuple[str]:
+        dataframe = self.__model.obter_depara_video(
+            assunto=assunto, flag=1, titulo_video=None, id_canal=None)
+        canais = tuple(dataframe['titulo_video'].tolist())
+        return canais
+
+    def gerar_resultados_videos(self, assunto: str, titulo_video: str, coluna_analise: str) -> pd.DataFrame:
+        id_video = self.__model.obter_depara_video(
+            assunto=assunto, flag=2, titulo_video=titulo_video, id_canal=None)
+        id_video = id_video['id_video'].to_string().split(' ')[-1]
+        dataframe = self.__model.obter_total_dados_video_turno(
+            assunto=assunto, coluna_analise=coluna_analise, id_video=id_video)
+        return dataframe
+
+    def listar_inputs_canal_video_assunto(self, nome_canal: str, assunto: str) -> Tuple[str]:
+        id_canal = self.__model.obter_depara_canal(
+            assunto=assunto, flag=2, nm_canal=nome_canal)
+        id_canal = id_canal.to_string().split(' ')[-1]
+        print(id_canal)
+        dataframe = self.__model.obter_depara_video(
+            assunto=assunto, flag=3, titulo_video=None, id_canal=id_canal)
+        titulos_video = tuple(dataframe['titulo_video'].to_list())
+        return titulos_video
+
+    def gerar_layout_total_engagamento_canais(self, assunto: str, nome_canal: List[str]) -> pd.DataFrame:
+        lista_id_canais = self.__model.obter_depara_canal(
+            assunto=assunto, flag=2, nm_canal=nome_canal)
+        lista_id_canais = lista_id_canais['id_canal'].to_list()
+
+        dataframe = self.__model.obter_media_engajamento_canal_visualizacoes(
+            assunto=assunto, ids_canal=lista_id_canais)
+        return dataframe
+
+    def gerar_layout_total_engajamento_inscritos(self, assunto: str, nome_canal: List[str]):
+        lista_id_canais = self.__model.obter_depara_canal(
+            assunto=assunto, flag=2, nm_canal=nome_canal)
+        lista_id_canais = lista_id_canais['id_canal'].to_list()
+        dataframe = self.__model.obter_media_taxa_engajamento_canal_total_inscritos(
+            assunto=assunto,
+            ids_canal=lista_id_canais
+        )
+        return dataframe
+
+    def gerar_inputs_multiplos_videos(self, nome_canal: List[str], assunto: str):
+        lista_id_canais = self.__model.obter_depara_canal(
+            assunto=assunto, flag=2, nm_canal=nome_canal)
+        id_canal = lista_id_canais.to_string().split(' ')[-1]
+
+        lista_videos = self.__model.obter_depara_video(
+            assunto=assunto, flag=4, titulo_video=None, id_canal=id_canal)
+        lista_videos = lista_videos['titulo_video'].tolist()
+        print(lista_videos)
+        return lista_videos

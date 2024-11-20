@@ -166,6 +166,85 @@ class DashboardView:
                     self.__figura_view.gerar_grafico_total_por_canal_dia(
                         dataframe=dataframe)
 
+    def gerar_layout_analise_video(self, assunto: str):
+        st.write('Análise vídeo')
+
+        tab1, tab2, tab3 = st.tabs(
+            ['Total vísualizações', 'Total Likes', 'Total Comentários']
+        )
+
+        with st.container():
+
+            with tab1:
+                st.write('Total vísualizações')
+                coluna_analise = 'total_visualizacoes'
+
+                input_canais = self.__controller.listar_canais_assunto(
+                    assunto=assunto)
+                print(input_canais)
+                canais = st.selectbox(
+                    'selecione o canal',
+                    input_canais,
+                    placeholder='selecione os canais',
+                    key=7
+                )
+                titulo_video = self.__controller.listar_inputs_canal_video_assunto(
+                    assunto=assunto, nome_canal=canais)
+                videos = st.selectbox(
+                    'Escolha o vídeo ',
+                    titulo_video,
+                    placeholder='selecione o vídeo',
+                    key=8
+                )
+                dataframe = self.__controller.gerar_resultados_videos(
+                    assunto=assunto, titulo_video=videos, coluna_analise=coluna_analise)
+                self.__figura_view.gerar_grafico_video_visualizacoes(
+                    dataframe=dataframe)
+            with tab2:
+                coluna_analise = 'total_likes'
+                input_canais = self.__controller.listar_canais_assunto(
+                    assunto=assunto)
+                canais = st.selectbox(
+                    'selecione o canal',
+                    input_canais,
+                    placeholder='selecione os canais',
+                    key=9
+                )
+                titulo_video = self.__controller.listar_inputs_canal_video_assunto(
+                    assunto=assunto, nome_canal=canais)
+                videos = st.selectbox(
+                    'Escolha o vídeo ',
+                    titulo_video,
+                    placeholder='selecione o vídeo',
+                    key=10
+                )
+                dataframe = self.__controller.gerar_resultados_videos(
+                    assunto=assunto, titulo_video=videos, coluna_analise=coluna_analise)
+                self.__figura_view.gerar_grafico_video_likes(
+                    dataframe=dataframe)
+            with tab3:
+                coluna_analise = 'total_comentarios'
+                input_canais = self.__controller.listar_canais_assunto(
+                    assunto=assunto)
+                canais = st.selectbox(
+                    'selecione o canal',
+                    input_canais,
+                    placeholder='selecione os canais',
+                    key=11
+                )
+                titulo_video = self.__controller.listar_inputs_canal_video_assunto(
+                    assunto=assunto, nome_canal=canais)
+                videos = st.selectbox(
+                    'Escolha o vídeo ',
+                    titulo_video,
+                    placeholder='selecione o vídeo',
+                    key=12
+                )
+                dataframe = self.__controller.gerar_resultados_videos(
+                    assunto=assunto, titulo_video=videos, coluna_analise=coluna_analise)
+                self.__figura_view.gerar_grafico_video_comentarios(
+                    dataframe=dataframe)
+
     def gerar_layout_taxa_engajamento(self, assunto: str):
         with st.container():
             st.write('Análise Taxa engajamento')
@@ -173,7 +252,7 @@ class DashboardView:
             tab1, tab2, tab3 = st.tabs(
                 [
                     'Média engajamento canal vísualização',
-                    'Média engajamento total inscritos ',
+                    'Média engajamento total inscritos',
                     'Média engajamento vídeo'
                 ]
             )
@@ -184,12 +263,46 @@ class DashboardView:
                 nome_canais = st.multiselect(
                     'Escolha um ou mais canais',
                     lista_canais,
-                    lista_canais[0]
+                    lista_canais[0],
+                    key=13
                 )
+
+                dataframe = self.__controller.gerar_layout_total_engagamento_canais(
+                    assunto=assunto, nome_canal=nome_canais)
+                self.__figura_view.gerar_grafico_taxa_engajamento_total_inscritos(
+                    dataframe=dataframe)
+            with tab2:
+                st.write('Média engajamento do total por inscritos')
+                lista_canais = self.__controller.gerar_canal_input_multiplos(
+                    assunto=assunto)
+                nome_canais = st.multiselect(
+                    'Escolha um ou mais canais',
+                    lista_canais,
+                    lista_canais[0],
+                    key=14
+                )
+                dataframe = self.__controller.gerar_layout_total_engajamento_inscritos(
+                    assunto=assunto, nome_canal=nome_canais)
+                self.__figura_view.gerar_grafico_taxa_engajamento_total_inscritos(
+                    dataframe=dataframe)
+
+            with tab3:
+                st.write('Média engajamento vídeo')
+                lista_canais = self.__controller.gerar_canal_input_multiplos(
+                    assunto=assunto)
+                nome_canais = st.multiselect(
+                    'Escolha um ou mais canais',
+                    lista_canais,
+                    lista_canais[0],
+                    key=15
+                )
+
+                # dataframe = self.__controller.gerar_layout_taxa_engajamento_video
 
     def rodar_dashboard(self):
         assunto = self.gerar_layout_assunto()
         self.gerar_layout_analise_canais(assunto=assunto)
+        self.gerar_layout_analise_video(assunto=assunto)
         self.gerar_layout_taxa_engajamento(assunto=assunto)
 
     # def mostrar_input_canal(self, dataframe: pd.DataFrame, chave_input: int):
