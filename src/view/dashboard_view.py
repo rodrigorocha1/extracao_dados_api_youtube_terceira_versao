@@ -181,7 +181,7 @@ class DashboardView:
 
                 input_canais = self.__controller.listar_canais_assunto(
                     assunto=assunto)
-                print(input_canais)
+
                 canais = st.selectbox(
                     'selecione o canal',
                     input_canais,
@@ -190,6 +190,7 @@ class DashboardView:
                 )
                 titulo_video = self.__controller.listar_inputs_canal_video_assunto(
                     assunto=assunto, nome_canal=canais)
+                print(titulo_video)
                 videos = st.selectbox(
                     'Escolha o vídeo ',
                     titulo_video,
@@ -315,6 +316,6 @@ class DashboardView:
 
     def rodar_dashboard(self):
         assunto = self.gerar_layout_assunto()
-        # self.gerar_layout_analise_canais(assunto=assunto)
-        # self.gerar_layout_analise_video(assunto=assunto)
+        self.gerar_layout_analise_canais(assunto=assunto)
+        self.gerar_layout_analise_video(assunto=assunto)
         self.gerar_layout_taxa_engajamento(assunto=assunto)

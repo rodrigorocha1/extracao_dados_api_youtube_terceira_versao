@@ -27,6 +27,7 @@ class Medida:
             pd.DataFrame: dataframe do pandas com id_video e título vídeo, dataframe com id_video ou um dataframe com título vídeo
         """
         parametros: Union[List[Any], Tuple[Any, ...]]
+
         if flag == 1:
             sql = f"""
                 SELECT
@@ -54,18 +55,32 @@ class Medida:
                 'id_video': 'string'
             }
             parametros = (assunto, titulo_video)
+            print(parametros)
         elif flag == 3:
-            canal_placeholder = ', '.join(['%s'] * len(id_canal))
-            parametros = (assunto, *id_canal)
-            sql = f"""
-                SELECT
-                    titulo_video
-                FROM
-                    depara_video
-                WHERE
-                    assunto = %s
-                    AND id_canal IN ({canal_placeholder})
-            """
+            if isinstance(id_canal, List):
+                canal_placeholder = ', '.join(['%s'] * len(id_canal))
+                parametros = (assunto, *id_canal)
+                sql = f"""
+                    SELECT
+                        titulo_video
+                    FROM
+                        depara_video
+                    WHERE
+                        assunto = %s
+                        AND id_canal IN ({canal_placeholder})
+                """
+            else:
+                parametros = (assunto, id_canal)
+                sql = f"""
+                    SELECT
+                        titulo_video
+                    FROM
+                        depara_video
+                    WHERE
+                        assunto = %s
+                        AND id_canal = %s
+                """
+
             tipos = {
                 'titulo_video': 'string'
             }
@@ -84,7 +99,7 @@ class Medida:
             tipos = {
                 'id_video': 'string'
             }
-
+        print(sql % parametros)
         try:
             dataframe = pd.read_sql_query(
                 sql=sql, con=self.__conexao, dtype=tipos, params=parametros)
