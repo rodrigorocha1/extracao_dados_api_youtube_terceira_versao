@@ -296,13 +296,24 @@ class DashboardView:
                     lista_canais[0],
                     key=15
                 )
+                st.write(nome_canais)
+                lista_videos = self.__controller.gerar_inputs_multiplos_videos(
+                    nome_canal=nome_canais, assunto=assunto)
+                st.write(lista_videos)
+
+                nome_videos = st.multiselect(
+                    'Escolha um ou mais vídeos',
+                    lista_videos,
+                    lista_videos[0],
+                    key=16
+                )
 
                 # dataframe = self.__controller.gerar_layout_taxa_engajamento_video
 
     def rodar_dashboard(self):
         assunto = self.gerar_layout_assunto()
-        self.gerar_layout_analise_canais(assunto=assunto)
-        self.gerar_layout_analise_video(assunto=assunto)
+        # self.gerar_layout_analise_canais(assunto=assunto)
+        # self.gerar_layout_analise_video(assunto=assunto)
         self.gerar_layout_taxa_engajamento(assunto=assunto)
 
     # def mostrar_input_canal(self, dataframe: pd.DataFrame, chave_input: int):

@@ -12,7 +12,9 @@ class Medida:
         self.__Sessao = self.__db.obter_sessao()
         Base.metadata.create_all(self.__conexao)
 
-    def obter_depara_video(self, assunto: str, flag: int, titulo_video: str, id_canal: Optional[str] = None) -> pd.DataFrame:
+    def obter_depara_video(self, assunto: str,
+                           flag: int, titulo_video: str,
+                           id_canal: Union[Optional[str], List[str]] = None) -> pd.DataFrame:
         """Método para obter os dados do vídeo      
 
         Args:
@@ -53,6 +55,8 @@ class Medida:
             }
             parametros = (assunto, titulo_video)
         else:
+            canal_placeholder = ', '.join(['%s'] * len(id_canal))
+            parametros = (assunto, *id_canal)
             sql = f"""
                 SELECT
                     titulo_video
@@ -60,12 +64,12 @@ class Medida:
                     depara_video
                 WHERE
                     assunto = %s
-                    AND id_canal = %s
+                    AND id_canal IN ({canal_placeholder})
             """
             tipos = {
                 'titulo_video': 'string'
             }
-            parametros = (assunto, id_canal)
+            print(sql % parametros)
 
         try:
             dataframe = pd.read_sql_query(
