@@ -35,7 +35,7 @@ class Medida:
                 WHERE
                     assunto = %s
             """
-            parametros = [assunto]
+            parametros = (assunto)
             tipos = {
                 'id_video': 'string',
                 'titulo_video': 'string'
@@ -51,7 +51,7 @@ class Medida:
             tipos = {
                 'id_video': 'string'
             }
-            parametros = [assunto, titulo_video]
+            parametros = (assunto, titulo_video)
         else:
             sql = f"""
                 SELECT
@@ -65,7 +65,7 @@ class Medida:
             tipos = {
                 'titulo_video': 'string'
             }
-            parametros = [assunto, id_canal]
+            parametros = (assunto, id_canal)
 
         try:
             dataframe = pd.read_sql_query(
