@@ -1,6 +1,6 @@
 from src.config.conexao import ConexaoBancoHive
 from src.config.config_banco import Base
-from typing import List, Optional, Sequence, Tuple
+from typing import Any, List, Optional, Sequence, Tuple, Union
 import pandas as pd
 
 
@@ -12,8 +12,19 @@ class Medida:
         self.__Sessao = self.__db.obter_sessao()
         Base.metadata.create_all(self.__conexao)
 
-    def obter_depara_video(self, assunto: str, flag: int, titulo_video: str, id_canal: str = None) -> pd.DataFrame:
-        parametros: Tuple[str, ...]
+    def obter_depara_video(self, assunto: str, flag: int, titulo_video: str, id_canal: Optional[str] = None) -> pd.DataFrame:
+        """Método para obter os dados do vídeo      
+
+        Args:
+            assunto (str): assunto a ser pesquisado
+            flag (int): flag direcionamento 1 = assunto, 2 = assunto e título  e 3 assunto e id canal
+            titulo_video (str): nome do vídeo 
+            id_canal (str, optional): _description_. id do canal to None.
+
+        Returns:
+            pd.DataFrame: dataframe do pandas com id_video e título vídeo, dataframe com id_video ou um dataframe com título vídeo
+        """
+        parametros: Union[List[Any], Tuple[Any, ...]]
         if flag == 1:
             sql = f"""
                 SELECT
@@ -24,14 +35,14 @@ class Medida:
                 WHERE
                     assunto = %s
             """
-            parametros = (assunto,)
+            parametros = [assunto]
             tipos = {
                 'id_video': 'string',
                 'titulo_video': 'string'
             }
         elif flag == 2:
             sql = f"""
-               SELECT  
+               SELECT
                     id_video
                 from depara_video
                 WHERE  assunto = %s
@@ -40,7 +51,7 @@ class Medida:
             tipos = {
                 'id_video': 'string'
             }
-            parametros = (assunto, titulo_video)
+            parametros = [assunto, titulo_video]
         else:
             sql = f"""
                 SELECT
@@ -54,7 +65,7 @@ class Medida:
             tipos = {
                 'titulo_video': 'string'
             }
-            parametros = (assunto, id_canal)
+            parametros = [assunto, id_canal]
 
         try:
             dataframe = pd.read_sql_query(
@@ -65,7 +76,16 @@ class Medida:
         return dataframe
 
     def obter_depara_canal(self, assunto: str, flag: int, nm_canal: Optional[str]) -> pd.DataFrame:
+        """Método para obter os dados canal
 
+        Args:
+            assunto (str): assunto de pesquisa
+            flag (int): flag de direcionamento 1 - assunto 2 - assunto e nome canal
+            nm_canal (Optional[str]): nome do canal 
+
+        Returns:
+            pd.DataFrame: dataframe com id canal e nome canal ou um dataframe com o id canal
+        """
         if flag == 1:
             sql = """
                 SELECT
@@ -118,6 +138,16 @@ class Medida:
         return dataframe
 
     def obter_dados_canal_turno(self, assunto: str, id_canal: str, coluna_analise: str) -> pd.DataFrame:
+        """ Método para obter as análises do canal por turno
+
+        Args:
+            assunto (str): assunto de pesquisa
+            id_canal (str): id_canal
+            coluna_analise (str): coluna de análise [total_visualizacoes, total_inscritos, total_videos_publicados]
+
+        Returns:
+            pd.DataFrame: dataframe com as análises
+        """
         sql = f"""
 
             SELECT
@@ -180,6 +210,16 @@ class Medida:
         return dataframe
 
     def obter_dado_canal_dia(self, assunto: str, id_canal: str, coluna_analise: str) -> pd.DataFrame:
+        """Método para obter os dados do canal por dia
+
+        Args:
+            assunto (str): assunto de pesquisa  
+            id_canal (str): id do canal
+            coluna_analise (str): coluna de análise [total_visualizacoes, total_inscritos, total_videos_publicados]
+
+        Returns:
+            pd.DataFrame: dataframe com as análise
+        """
         sql = f"""
 
             SELECT
@@ -243,6 +283,16 @@ class Medida:
         return dataframe
 
     def obter_total_dados_video_turno(self, id_video: str, assunto: str, coluna_analise: str) -> pd.DataFrame:
+        """Método para obter as análises do vídeo por turno
+
+        Args:
+            id_video (str): id do vídeo
+            assunto (str): assunto de pesquisa
+            coluna_analise (str): [total_visualizacoes, total_likes, total_comentarios]
+
+        Returns:
+            pd.DataFrame: dataframe com as análises
+        """
         sql = f"""
             SELECT
                 ev.turno_extracao AS turno_extracao,
@@ -302,6 +352,15 @@ class Medida:
         return dataframe
 
     def obter_media_taxa_engajamento_canal_total_inscritos(self, assunto: str, ids_canal: List[str]) -> pd.DataFrame:
+        """Método para obter taxa engajamento total inscritos
+
+        Args:
+            assunto (str): assunto de pesquisa
+            ids_canal (List[str]): lista de canais
+
+        Returns:
+            pd.DataFrame: dataframe com os dados
+        """
         ids_canal_placeholder = ', '.join(
             ['%s'] * len(ids_canal)) if isinstance(ids_canal, list) else '%s'
 
@@ -392,8 +451,16 @@ class Medida:
 
         return dataframe
 
-    def obter_media_engajamento_canal(self, ids_canal: List, assunto: str) -> pd.DataFrame:
+    def obter_media_engajamento_canal_visualizacoes(self, ids_canal: List, assunto: str) -> pd.DataFrame:
+        """Método para obter média engajamento do canal por vísualizações
 
+        Args:
+            ids_canal (List): lista com os id do canal
+            assunto (str): assunto do canal
+
+        Returns:
+            pd.DataFrame: dataframe pandas
+        """
         ids_canal_placeholder = ', '.join(
             ['%s'] * len(ids_canal)) if isinstance(ids_canal, list) else '%s'
 
