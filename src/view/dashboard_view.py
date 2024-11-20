@@ -59,7 +59,14 @@ class DashboardView:
                 )
                 with tab1:
                     coluna_analise = 'total_visualizacoes'
-                    canais = self.__controller
+                    input_canais = self.__controller.listar_canais_assunto(
+                        assunto=assunto)
+                    canais = st.selectbox(
+                        'selecione o canal',
+                        input_canais,
+                        placeholder='selecione os canais'
+
+                    )
 
     def rodar_dashboard(self):
         assunto = self.gerar_layout_assunto()
