@@ -14,7 +14,7 @@ class Medida:
 
     def obter_depara_video(self, assunto: str,
                            flag: int, titulo_video: Union[str, List[str]],
-                           id_canal: Union[Optional[str], List[str]] = None, id_video: List[str] = None) -> pd.DataFrame:
+                           id_canal: Union[Optional[str], List[str]] = None, id_video: Optional[List[str]] = None) -> pd.DataFrame:
         """Método para obter os dados do vídeo      
 
         Args:
@@ -38,7 +38,7 @@ class Medida:
                 WHERE
                     assunto = %s
             """
-            parametros = (assunto)
+            parametros = (assunto,)
             tipos = {
                 'id_video': 'string',
                 'titulo_video': 'string'
