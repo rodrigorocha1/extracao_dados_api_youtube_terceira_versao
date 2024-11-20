@@ -120,15 +120,10 @@ class DashboardController:
         return lista_videos
 
     def gerar_resultado_engajamento_videos(self, assunto: str, lista_videos: List[str]) -> pd.DataFrame:
-        print(assunto, lista_videos)
         dataframe_id_video = self.__model.obter_depara_video(
             assunto=assunto, flag=4, titulo_video=lista_videos)
-
-        print(dataframe_id_video)
-
         lista_id_video = dataframe_id_video['id_video'].to_list()
-        print(lista_id_video)
         dataframe_resultado = self.__model.obter_taxa_engajamento_video(
             assunto=assunto, id_video=lista_id_video)
-        print(dataframe_resultado)
+
         return dataframe_resultado
