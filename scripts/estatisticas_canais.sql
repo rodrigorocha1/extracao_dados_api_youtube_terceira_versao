@@ -768,5 +768,94 @@ SELECT
 
 
 
--------------------
-SELECT data_extracao, regexp_replace( date_format(data_extracao, 'EEEE'), 'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday', CASE date_format(data_extracao, 'EEEE') WHEN 'Monday' THEN 'Segunda-feira' WHEN 'Tuesday' THEN 'Terça-feira' WHEN 'Wednesday' THEN 'Quarta-feira' WHEN 'Thursday' THEN 'Quinta-feira' WHEN 'Friday' THEN 'Sexta-feira' WHEN 'Saturday' THEN 'Sábado' WHEN 'Sunday' THEN 'Domingo' END ) AS dia_da_semana, total_visualizacoes, COALESCE ( LAG(total_visualizacoes, 1) OVER( PARTITION BY id_canal ORDER BY data_extracao ), 0 ) AS total_visualizacoes_anterior, COALESCE ( total_visualizacoes - LAG(total_visualizacoes, 1) OVER( PARTITION BY id_canal ORDER BY data_extracao ), 0 ) as total_visualizacoes_dia FROM estatisticas_canais ec WHERE assunto = 'Linux' AND id_canal = 'UCbqbbDSvjo4kmwIITnXbJag' AND turno_extracao = 'Noite' ORDER BY data_extracao ASC
+/*
+ Média engajamento Vídeo dia     
+ 
+
+*/ 
+        
+
+WITH engajamento_dia AS (
+  SELECT 
+    ev.titulo_video,
+    ev.data_extracao,
+    ev.turno_extracao,
+    ev.total_likes,
+    ev.total_comentarios,
+    ev.total_visualizacoes,
+    COALESCE(
+      (ev.total_likes + ev.total_comentarios) / NULLIF(ev.total_visualizacoes, 0) * 100, 
+      0
+    ) AS taxa_engajamento_total,
+    -- Calcula as diferenças diárias utilizando LAG
+    LAG(ev.total_likes) OVER (
+      PARTITION BY ev.id_video 
+      ORDER BY ev.data_extracao
+    ) AS likes_anteriores,
+    LAG(ev.total_comentarios) OVER (
+      PARTITION BY ev.id_video 
+      ORDER BY ev.data_extracao
+    ) AS comentarios_anteriores,
+    LAG(ev.total_visualizacoes) OVER (
+      PARTITION BY ev.id_video 
+      ORDER BY ev.data_extracao
+    ) AS visualizacoes_anteriores
+  FROM 
+    estatisticas_videos ev
+  WHERE 
+    ev.assunto = 'cities skylines' 
+    AND ev.id_video IN ('jU_ooxfchd4') 
+    and ev.turno_extracao = 'Noite'
+)
+
+SELECT 
+  titulo_video,
+  data_extracao,
+  turno_extracao,
+  -- Taxa de engajamento baseada no incremento diário
+  COALESCE(
+    ((total_likes - likes_anteriores) + (total_comentarios - comentarios_anteriores)) / 
+    NULLIF((total_visualizacoes - visualizacoes_anteriores), 0) * 100,
+    0
+  ) AS taxa_engajamento_dia
+FROM 
+  engajamento_dia
+WHERE COALESCE(
+    ((total_likes - likes_anteriores) + (total_comentarios - comentarios_anteriores)) / 
+    NULLIF((total_visualizacoes - visualizacoes_anteriores), 0) * 100,
+    0
+  )  > 0
+ORDER BY 
+  data_extracao;
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+      
