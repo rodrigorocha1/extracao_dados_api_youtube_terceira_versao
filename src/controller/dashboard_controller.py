@@ -111,10 +111,10 @@ class DashboardController:
     def gerar_inputs_multiplos_videos(self, nome_canal: List[str], assunto: str):
         lista_id_canais = self.__model.obter_depara_canal(
             assunto=assunto, flag=2, nm_canal=nome_canal)
-        id_canal = lista_id_canais.to_string().split(' ')[-1]
+        id_canal = lista_id_canais['id_canal'].to_list()
 
         lista_videos = self.__model.obter_depara_video(
-            assunto=assunto, flag=4, titulo_video=None, id_canal=id_canal)
+            assunto=assunto, flag=3, titulo_video=None, id_canal=id_canal)
         lista_videos = lista_videos['titulo_video'].tolist()
         print(lista_videos)
         return lista_videos

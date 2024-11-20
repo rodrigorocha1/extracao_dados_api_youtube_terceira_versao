@@ -23,6 +23,3 @@ class FiguraView:
 
     def gerar_grafico_taxa_engajamento_total_inscritos(self, dataframe: pd.DataFrame):
         st.dataframe(dataframe)
-
-    def gerar_grafico_taxa_engajamento_video(self, dataframe: pd.DataFrame):
-        st.dataframe(dataframe)
