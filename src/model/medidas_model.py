@@ -55,7 +55,7 @@ class Medida:
                 'id_video': 'string'
             }
             parametros = (assunto, titulo_video)
-            print(parametros)
+
         elif flag == 3:
             if isinstance(id_canal, List):
                 canal_placeholder = ', '.join(['%s'] * len(id_canal))
@@ -99,7 +99,7 @@ class Medida:
             tipos = {
                 'id_video': 'string'
             }
-        print(sql % parametros)
+
         try:
             dataframe = pd.read_sql_query(
                 sql=sql, con=self.__conexao, dtype=tipos, params=parametros)
