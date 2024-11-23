@@ -26,7 +26,13 @@ class FiguraView:
                 x='dia_da_semana',
                 y=coluna_turno,
                 color='turno_extracao',
-                barmode='group'
+                barmode='group',
+                title=f'Análise Total por Canal e Turno - {coluna_analise.capitalize()}',
+                labels={
+                    'dia_da_semana': 'Dia da Semana',
+                    coluna_turno: 'Total por Turno',
+                    'turno_extracao': 'Turno'
+                }
             )
             st.plotly_chart(fig)
         else:
