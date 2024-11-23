@@ -64,6 +64,11 @@ class FiguraView:
 
         if not (dataframe[coluna_turno] == 0).all():
             turno_ordem = ['Manhã', 'Tarde', 'Noite']
+            dias_semana_ordenacao = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira',
+                                     'Quinta-feira', 'Sexta-feira', 'Sábado', ]
+
+            # dataframe['dia_semana'] = pd.Categorical(
+            #     dataframe['dia_semana'], categories=dias_semana_ordenacao, ordered=True)
 
             dataframe['turno_extracao'] = pd.Categorical(
                 dataframe['turno_extracao'], categories=turno_ordem, ordered=True)
