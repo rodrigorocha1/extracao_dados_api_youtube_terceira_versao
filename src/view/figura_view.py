@@ -50,14 +50,37 @@ class FiguraView:
 
         st.plotly_chart(fig)
 
-    def gerar_grafico_video_likes(self, dataframe: pd.DataFrame):
-        st.dataframe(dataframe)
-
     def gerar_grafico_video_comentarios(self, dataframe: pd.DataFrame):
         st.dataframe(dataframe)
 
-    def gerar_grafico_video_visualizacoes(self, dataframe: pd.DataFrame):
+    def gerar_grafico_video_visualizacoes(self, dataframe: pd.DataFrame, coluna_analise: str):
+        ######
         st.dataframe(dataframe)
+        coluna_turno = f'{coluna_analise}_turno'
+
+        if coluna_turno not in dataframe.columns:
+            st.write(f"A coluna '{coluna_turno}' não existe no DataFrame.")
+            return
+
+        if not (dataframe[coluna_turno] == 0).all():
+            turno_ordem = ['Manhã', 'Tarde', 'Noite']
+
+            dataframe['turno_extracao'] = pd.Categorical(
+                dataframe['turno_extracao'], categories=turno_ordem, ordered=True)
+            if dataframe.empty:
+                st.write("O DataFrame está vazio.")
+                return
+            fig = px.bar(
+                dataframe,
+                x='dia_semana',
+                y=coluna_turno,
+                color='turno_extracao',
+                barmode='group',
+                category_orders={'turno_extracao': turno_ordem},
+            )
+            st.plotly_chart(fig)
+        else:
+            st.write("Sem valores válidos na coluna.")
 
     def gerar_grafico_taxa_engajamento_visualizacao(self, dataframe: pd.DataFrame):
         st.dataframe(dataframe)
