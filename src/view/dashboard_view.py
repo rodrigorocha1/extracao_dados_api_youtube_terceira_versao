@@ -74,7 +74,7 @@ class DashboardView:
                         assunto=assunto, coluna_analise=coluna_analise, nome_canal=canais)
 
                     self.__figura_view.gerar_grafico_total_por_canal_turno(
-                        dataframe=dataframe)
+                        dataframe=dataframe, coluna_analise=coluna_analise)
                 with tab2:
                     st.write('Total Inscritos')
                     coluna_analise = 'total_inscritos'
@@ -91,7 +91,7 @@ class DashboardView:
                         assunto=assunto, coluna_analise=coluna_analise, nome_canal=canais)
 
                     self.__figura_view.gerar_grafico_total_por_canal_turno(
-                        dataframe=dataframe)
+                        dataframe=dataframe, coluna_analise=coluna_analise)
                 with tab3:
                     st.write('Total Vídeo')
                     coluna_analise = 'total_videos_publicados'
@@ -106,7 +106,7 @@ class DashboardView:
                     dataframe = self.__controller.gerar_resultado_total_canais(
                         assunto=assunto, coluna_analise=coluna_analise, nome_canal=canais)
                     self.__figura_view.gerar_grafico_total_por_canal_turno(
-                        dataframe=dataframe)
+                        dataframe=dataframe, coluna_analise=coluna_analise)
 
             with col2:
 
@@ -135,7 +135,7 @@ class DashboardView:
                     dataframe = self.__controller.gerar_resultado_total_canais(
                         coluna_analise=coluna_analise, assunto=assunto, nome_canal=canais, flag_turno=2)
                     self.__figura_view.gerar_grafico_total_por_canal_dia(
-                        dataframe=dataframe)
+                        dataframe=dataframe, coluna_analise=coluna_analise)
 
                 with tab2:
                     coluna_analise = 'total_inscritos'
@@ -150,7 +150,7 @@ class DashboardView:
                     dataframe = self.__controller.gerar_resultado_total_canais(
                         coluna_analise=coluna_analise, assunto=assunto, nome_canal=canais, flag_turno=2)
                     self.__figura_view.gerar_grafico_total_por_canal_dia(
-                        dataframe=dataframe)
+                        dataframe=dataframe, coluna_analise=coluna_analise)
                 with tab3:
                     coluna_analise = 'total_videos_publicados'
                     input_canais = self.__controller.listar_canais_assunto(
@@ -164,7 +164,7 @@ class DashboardView:
                     dataframe = self.__controller.gerar_resultado_total_canais(
                         coluna_analise=coluna_analise, assunto=assunto, nome_canal=canais, flag_turno=2)
                     self.__figura_view.gerar_grafico_total_por_canal_dia(
-                        dataframe=dataframe)
+                        dataframe=dataframe, coluna_analise=coluna_analise)
 
     def gerar_layout_analise_video(self, assunto: str):
         st.write('Análise vídeo')
