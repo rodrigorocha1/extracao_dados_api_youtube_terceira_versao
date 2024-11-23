@@ -6,7 +6,7 @@ from src.view.figura_view import FiguraView
 
 class DashboardView:
 
-    st.set_page_config(layout='wide')
+    st.set_page_config(layout='wide', page_title='Dashboard Youtube')
 
     def __init__(self):
         self.__controller = DashboardController()

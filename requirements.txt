@@ -61,6 +61,7 @@ duckdb_engine==0.13.4
 email_validator==2.2.0
 exceptiongroup==1.2.2
 executing==2.1.0
+fastjsonschema==2.20.0
 fastparquet==2024.5.0
 Flask==2.2.5
 Flask-AppBuilder==4.5.0
@@ -128,6 +129,7 @@ multidict==6.1.0
 mypy==1.13.0
 mypy-extensions==1.0.0
 narwhals==1.13.5
+nbformat==5.10.4
 nest-asyncio==1.6.0
 numpy==1.26.4
 opentelemetry-api==1.27.0
@@ -148,6 +150,7 @@ pendulum==3.0.0
 pexpect==4.9.0
 pillow==11.0.0
 platformdirs==4.3.6
+plotly==5.24.1
 pluggy==1.5.0
 prison==0.2.1
 prometheus_client==0.20.0
