@@ -774,6 +774,26 @@ SELECT
 
 */ 
         
+ SELECT 
+  ev.titulo_video, 
+  ev.turno_extracao, 
+  ev.data_extracao, 
+  COALESCE(
+    (
+      ev.total_likes + ev.total_comentarios
+    ) / NULLIF(ev.total_visualizacoes, 0) * 100, 
+    0
+  ) AS taxa_engajamento
+
+FROM 
+  estatisticas_videos ev 
+WHERE 
+  ev.assunto = 'cities skylines' 
+  AND ev.id_video IN ('jU_ooxfchd4') 
+  AND ev.turno_extracao = 'Noite' 
+ORDER BY 
+  ev.data_extracao;
+        
 
 WITH engajamento_dia AS (
   SELECT 
@@ -808,44 +828,7 @@ WITH engajamento_dia AS (
     and ev.turno_extracao = 'Noite'
 )
 
-SELECT 
-  titulo_video,
-  data_extracao,
-  turno_extracao,
-  -- Taxa de engajamento baseada no incremento diário
-  COALESCE(
-    ((total_likes - likes_anteriores) + (total_comentarios - comentarios_anteriores)) / 
-    NULLIF((total_visualizacoes - visualizacoes_anteriores), 0) * 100,
-    0
-  ) AS taxa_engajamento_dia
-FROM 
-  engajamento_dia
-WHERE COALESCE(
-    ((total_likes - likes_anteriores) + (total_comentarios - comentarios_anteriores)) / 
-    NULLIF((total_visualizacoes - visualizacoes_anteriores), 0) * 100,
-    0
-  )  > 0
-ORDER BY 
-  data_extracao;
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         
         
         
