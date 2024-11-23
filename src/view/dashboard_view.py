@@ -190,7 +190,7 @@ class DashboardView:
                 )
                 titulo_video = self.__controller.listar_inputs_canal_video_assunto(
                     assunto=assunto, nome_canal=canais)
-                print(titulo_video)
+
                 videos = st.selectbox(
                     'Escolha o vídeo ',
                     titulo_video,
@@ -250,11 +250,10 @@ class DashboardView:
         with st.container():
             st.write('Análise Taxa engajamento')
 
-            tab1, tab2, tab3 = st.tabs(
+            tab1, tab2 = st.tabs(
                 [
                     'Média engajamento canal vísualização',
-                    'Média engajamento total inscritos',
-                    'Média engajamento vídeo'
+                    'Média engajamento total inscritos'
                 ]
             )
             with tab1:
@@ -285,33 +284,6 @@ class DashboardView:
                 dataframe = self.__controller.gerar_layout_total_engajamento_inscritos(
                     assunto=assunto, nome_canal=nome_canais)
                 self.__figura_view.gerar_grafico_taxa_engajamento_total_inscritos(
-                    dataframe=dataframe)
-
-            with tab3:
-                st.write('Média engajamento vídeo')
-                lista_canais = self.__controller.gerar_canal_input_multiplos(
-                    assunto=assunto)
-                nome_canais = st.multiselect(
-                    'Escolha um ou mais canais',
-                    lista_canais,
-                    lista_canais[0],
-                    key=15
-                )
-
-                lista_videos = self.__controller.gerar_inputs_multiplos_videos(
-                    nome_canal=nome_canais, assunto=assunto)
-
-                nome_videos = st.multiselect(
-                    'Escolha um ou mais vídeos',
-                    lista_videos,
-                    lista_videos[0],
-                    key=16
-                )
-
-                dataframe = self.__controller.gerar_resultado_engajamento_videos(
-                    assunto=assunto, lista_videos=nome_videos)
-
-                self.__figura_view.gerar_grafico_taxa_engajamento_visualizacao(
                     dataframe=dataframe)
 
     def rodar_dashboard(self):

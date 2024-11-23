@@ -83,10 +83,10 @@ class DashboardController:
         id_canal = self.__model.obter_depara_canal(
             assunto=assunto, flag=2, nm_canal=nome_canal)
         id_canal = id_canal.to_string().split(' ')[-1]
-        print('id_canal', id_canal)
+
         dataframe = self.__model.obter_depara_video(
             assunto=assunto, flag=3, titulo_video=None, id_canal=id_canal)
-        print('dataframe', dataframe)
+
         titulos_video = tuple(dataframe['titulo_video'].to_list())
         return titulos_video
 
@@ -119,12 +119,3 @@ class DashboardController:
         lista_videos = lista_videos['titulo_video'].tolist()
 
         return lista_videos
-
-    def gerar_resultado_engajamento_videos(self, assunto: str, lista_videos: List[str]) -> pd.DataFrame:
-        dataframe_id_video = self.__model.obter_depara_video(
-            assunto=assunto, flag=4, titulo_video=lista_videos)
-        lista_id_video = dataframe_id_video['id_video'].to_list()
-        dataframe_resultado = self.__model.obter_taxa_engajamento_video(
-            assunto=assunto, id_video=lista_id_video)
-
-        return dataframe_resultado
