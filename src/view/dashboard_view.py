@@ -270,7 +270,7 @@ class DashboardView:
                 dataframe = self.__controller.gerar_layout_total_engagamento_canais(
                     assunto=assunto, nome_canal=nome_canais)
                 self.__figura_view.gerar_grafico_taxa_engajamento_total_inscritos(
-                    dataframe=dataframe)
+                    dataframe=dataframe, coluna_analise='media_taxa_engajamento')
             with tab2:
                 st.write('Média engajamento do total por inscritos')
                 lista_canais = self.__controller.gerar_canal_input_multiplos(
@@ -284,7 +284,7 @@ class DashboardView:
                 dataframe = self.__controller.gerar_layout_total_engajamento_inscritos(
                     assunto=assunto, nome_canal=nome_canais)
                 self.__figura_view.gerar_grafico_taxa_engajamento_total_inscritos(
-                    dataframe=dataframe)
+                    dataframe=dataframe, coluna_analise='media_taxa_engajamento')
 
     def rodar_dashboard(self):
         assunto = self.gerar_layout_assunto()
