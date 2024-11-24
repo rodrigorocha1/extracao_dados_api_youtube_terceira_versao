@@ -296,6 +296,6 @@ class DashboardView:
 
     def rodar_dashboard(self):
         assunto = self.gerar_layout_assunto()
-        # self.gerar_layout_analise_canais(assunto=assunto)
-        # self.gerar_layout_analise_video(assunto=assunto)
+        self.gerar_layout_analise_canais(assunto=assunto)
+        self.gerar_layout_analise_video(assunto=assunto)
         self.gerar_layout_taxa_engajamento(assunto=assunto)

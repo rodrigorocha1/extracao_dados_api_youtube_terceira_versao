@@ -152,6 +152,7 @@ class FiguraView:
         st.plotly_chart(fig)
 
     def gerar_grafico_taxa_engajamento_total_inscritos(self, dataframe: pd.DataFrame, coluna_analise: str, cor_grafico: str):
+
         if coluna_analise not in dataframe.columns:
             st.write(f"A coluna '{coluna_analise}' não existe no DataFrame.")
             return
@@ -178,7 +179,8 @@ class FiguraView:
             y=coluna_analise,
             barmode='group',
             text=coluna_analise,
-            title='Análise taxa engajamento'
+            title='Análise taxa engajamento',
+            color='nm_canal'
 
         )
         hover_template = (
@@ -189,13 +191,13 @@ class FiguraView:
         fig.update_traces(
             hovertemplate=hover_template,
             textposition='outside',
-            marker=dict(color=cor_grafico),
+            # marker=dict(color=cor_grafico),
         )
 
         fig.update_layout(
             xaxis_title='Dias da Semana',
-            yaxis_title=coluna_analise,
-            bargap=0.1,
+            yaxis_title=coluna_analise.replace('_', '').capitalize(),
+            bargap=0.5,
             width=self.__largura + 350,
             height=self.__altura,
 
@@ -204,7 +206,7 @@ class FiguraView:
                 font_family="Arial"
             ),
             legend=dict(
-                title='Turno de Extração',
+                title='Nome Canal',
                 font=dict(
                     family="Arial",
                     size=12
