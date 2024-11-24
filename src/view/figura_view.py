@@ -4,6 +4,9 @@ import plotly.express as px
 
 
 class FiguraView:
+    def __init__(self):
+        self.__altura = 500
+        self.__largura = 800
 
     def gerar_grafico_total_por_canal_turno(self, dataframe: pd.DataFrame, coluna_analise: str):
         st.dataframe(dataframe)
@@ -18,7 +21,8 @@ class FiguraView:
             dataframe,
             y=f'{coluna_analise}_dia',
             x='dia_da_semana',
-            text=f'{coluna_analise}_dia'
+            text=f'{coluna_analise}_dia',
+            title=f'Análise Total por Canal e Dia - {coluna_analise.capitalize()}',
         )
 
         fig.update_traces(
@@ -41,7 +45,9 @@ class FiguraView:
                 categoryorder='array',
                 categoryarray=dias_semana_ordenacao
             ),
-            bargap=0.6
+            bargap=0.6,
+            width=self.__largura,
+            height=self.__altura
         )
         st.plotly_chart(fig)
 
