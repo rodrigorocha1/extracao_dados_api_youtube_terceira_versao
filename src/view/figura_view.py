@@ -152,8 +152,6 @@ class FiguraView:
         st.plotly_chart(fig)
 
     def gerar_grafico_taxa_engajamento_total_inscritos(self, dataframe: pd.DataFrame, coluna_analise: str, cor_grafico: str):
-        st.dataframe(dataframe)
-
         if coluna_analise not in dataframe.columns:
             st.write(f"A coluna '{coluna_analise}' não existe no DataFrame.")
             return
@@ -190,20 +188,17 @@ class FiguraView:
         )
         fig.update_traces(
             hovertemplate=hover_template,
-            textposition='outside'
+            textposition='outside',
+            marker=dict(color=cor_grafico),
         )
 
         fig.update_layout(
             xaxis_title='Dias da Semana',
             yaxis_title=coluna_analise,
-            yaxis=dict(
-                categoryorder='array',
-                categoryarray=dias_semana_ordenacao
-            ),
             bargap=0.1,
-            marker=dict(color=cor_grafico),
             width=self.__largura + 350,
             height=self.__altura,
+
             hoverlabel=dict(
                 font_size=self.__fonte_tamanho_hover_lavel,
                 font_family="Arial"

@@ -13,7 +13,8 @@ class DashboardView:
         self.__figura_view = FiguraView()
         self.__cor_total_visualizacoes = '#64E5A7'
         self.__cor_total_likes = '#FFB93F'
-        self.__cor_taxa_engajamento = '#FFB93F'
+        self.__cor_taxa_engajamento_video = '#FFB93F'
+        self.__cor_taxa_engajamento_inscritos = '#4E49F3'
         self.__cor_total_comentarios = '#4E49F3'
         self.__cor_total_inscritos = '#4FD9F7'
         self.__cor_total_video = '#C72341'
@@ -276,7 +277,8 @@ class DashboardView:
                 dataframe = self.__controller.gerar_layout_total_engagamento_canais(
                     assunto=assunto, nome_canal=nome_canais)
                 self.__figura_view.gerar_grafico_taxa_engajamento_total_inscritos(
-                    dataframe=dataframe, coluna_analise='media_taxa_engajamento')
+                    dataframe=dataframe, coluna_analise='media_taxa_engajamento',
+                    cor_grafico=self.__cor_taxa_engajamento_video, )
             with tab2:
                 st.write('Média engajamento do total por inscritos')
                 lista_canais = self.__controller.gerar_canal_input_multiplos(
@@ -290,7 +292,7 @@ class DashboardView:
                 dataframe = self.__controller.gerar_layout_total_engajamento_inscritos(
                     assunto=assunto, nome_canal=nome_canais)
                 self.__figura_view.gerar_grafico_taxa_engajamento_total_inscritos(
-                    dataframe=dataframe, coluna_analise='media_taxa_engajamento')
+                    dataframe=dataframe, coluna_analise='media_taxa_engajamento', cor_grafico=self.__cor_taxa_engajamento_inscritos)
 
     def rodar_dashboard(self):
         assunto = self.gerar_layout_assunto()
