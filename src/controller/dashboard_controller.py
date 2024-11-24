@@ -38,7 +38,7 @@ class DashboardController:
             flag_turno (int, optional): Direcionameto para consultar dados por turno ou por dia: 1-Turno/2-Dia. Defaults to 1.
             flag_input_canal (int, optional): Flag para trocar o input canal  1 - Exibir  id_canal - 2 exibir nome canal. Defaults to 1.
         Returns:
-            pd.DataFrame: _description_
+            pd.DataFrame: dataframe com o resultado
         """
         if flag_input_canal == 2:
 
@@ -87,13 +87,32 @@ class DashboardController:
         canais = tuple(dataframe['titulo_video'].tolist())
         return canais
 
-    def listar_canal_video_assunto(self, assunto: str, nome_canal: str) -> Tuple[str]:
+    def listar_canal_video_assunto(self, assunto: str) -> Tuple[str]:
+        """Lista os vídeos usando assunto
+
+        Args:
+            assunto (str): assunto de pesquisa
+
+        Returns:
+            Tuple[str]: tupla com  os títulos do vídeo
+        """
         dataframe = self.__model.obter_depara_video(
             assunto=assunto, flag=1, titulo_video=None, id_canal=None)
         canais = tuple(dataframe['titulo_video'].tolist())
         return canais
 
     def gerar_resultados_videos(self, assunto: str, titulo_video: str, coluna_analise: str, flag_input: int) -> pd.DataFrame:
+        """Método para gerar resultado do vídeo
+
+        Args:
+            assunto (str): assunto do vídeo
+            titulo_video (str): pode ser o título do vídeo ou id vídeo
+            coluna_analise (str): coluna de análise
+            flag_input (int): 1 para id vídeo, 2 para nome do vídeo
+
+        Returns:
+            pd.DataFrame: datafrane com o resultado
+        """
         if flag_input == 1:
             id_video = titulo_video
         else:
@@ -105,11 +124,25 @@ class DashboardController:
         return dataframe
 
     def listar_inputs_canal_video_assunto(self, nome_canal: str, assunto: str, flag_input_canal: int) -> Tuple[str]:
-        print('flag_input_canal', flag_input_canal)
+        """Método para listar os títulos do vídeos
+
+        Args:
+            nome_canal (str): pode ser o nome do canal ou id canal
+            assunto (str): assunto de pesquisa 
+            flag_input_canal (int): 1 para id, 2 para nome
+
+        Returns:
+            Tuple[str]: dataframe com o resultado
+        """
+
         if flag_input_canal == 1:
             id_canal = nome_canal
             dataframe = self.__model.obter_depara_video(
-                assunto=assunto, flag=5, titulo_video=None, id_canal=id_canal)
+                assunto=assunto,
+                flag=5,
+                titulo_video=None,
+                id_canal=id_canal
+            )
             titulos_video = tuple(dataframe['id_video'].to_list())
         else:
             id_canal = self.__model.obter_depara_canal(
@@ -122,6 +155,16 @@ class DashboardController:
         return titulos_video
 
     def gerar_layout_total_engagamento_canais(self, assunto: str, nome_canal: List[str], flag_input: int) -> pd.DataFrame:
+        """Método para gerar total layout engajamento
+
+        Args:
+            assunto (str): assunto
+            nome_canal (List[str]): pode ser o nome do canal ou id canal
+            flag_input (int): 1 para id, 2 para nome
+
+        Returns:
+            pd.DataFrame: dataframe com o resultado
+        """
         if flag_input == 1:
             lista_id_canais = nome_canal
         else:
@@ -133,7 +176,17 @@ class DashboardController:
             assunto=assunto, ids_canal=lista_id_canais)
         return dataframe
 
-    def gerar_layout_total_engajamento_inscritos(self, assunto: str, nome_canal: List[str], flag_input: int):
+    def gerar_layout_total_engajamento_inscritos(self, assunto: str, nome_canal: List[str], flag_input: int) -> pd.DataFrame:
+        """Método para gerar resutado total engajamento inscritos
+
+        Args:
+            assunto (str): assunto de pesquisa
+            nome_canal (List[str]): _description_
+            flag_input (int): 1 para id, 2 para nome
+
+        Returns:
+            pd.DataFrame: dataframe com o resultado
+        """
         if flag_input == 1:
             lista_id_canais = nome_canal
         else:
@@ -146,7 +199,16 @@ class DashboardController:
         )
         return dataframe
 
-    def gerar_inputs_multiplos_videos(self, nome_canal: List[str], assunto: str):
+    def gerar_inputs_multiplos_videos(self, nome_canal: List[str], assunto: str) -> List[str]:
+        """Método para gerar multiplos inputs vídeos
+
+        Args:
+            nome_canal (List[str]): nome do canal
+            assunto (str): ass
+
+        Returns:
+            List[str]: lista com o título do vídeo
+        """
         lista_id_canais = self.__model.obter_depara_canal(
             assunto=assunto, flag=2, nm_canal=nome_canal)
         id_canal = lista_id_canais['id_canal'].to_list()
