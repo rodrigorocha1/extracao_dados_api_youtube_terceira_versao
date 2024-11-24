@@ -20,10 +20,10 @@ class DashboardView:
     def gerar_layout_assunto(self):
         with st.container():
             menu_assunto = [
+                'cities skylines',
                 'Linux',
                 'Power BI',
                 'Python',
-                'cities skylines',
                 'monster hunter'
             ]
 

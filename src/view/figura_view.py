@@ -7,6 +7,8 @@ class FiguraView:
     def __init__(self):
         self.__altura = 500
         self.__largura = 800
+        self.__fonte_tamanho_hover_lavel = 14
+        self.__fonte_tamanho_titulo = 14
 
     def gerar_grafico_total_por_canal_turno(self, dataframe: pd.DataFrame, coluna_analise: str):
         st.dataframe(dataframe)
@@ -35,7 +37,7 @@ class FiguraView:
             ),
             marker=dict(color=cor_grafico),
             textfont=dict(
-                size=14
+                size=self.__fonte_tamanho_titulo
             ),
         )
         fig.update_layout(
@@ -47,7 +49,11 @@ class FiguraView:
             ),
             bargap=0.6,
             width=self.__largura,
-            height=self.__altura
+            height=self.__altura,
+            hoverlabel=dict(
+                font_size=self.__fonte_tamanho_hover_lavel,
+                font_family="Arial"
+            )
         )
         st.plotly_chart(fig)
 
