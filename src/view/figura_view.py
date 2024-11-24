@@ -44,7 +44,6 @@ class FiguraView:
 
         dataframe['dia_da_semana'] = pd.Categorical(
             dataframe['dia_da_semana'], categories=dias_semana_ordenacao, ordered=True)
-        st.dataframe(dataframe)
         fig = px.bar(dataframe, y=f'{coluna_analise}_dia',
                      x='dia_da_semana')
         fig.update_layout(
