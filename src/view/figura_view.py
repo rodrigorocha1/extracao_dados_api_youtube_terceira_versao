@@ -4,6 +4,7 @@ import plotly.express as px
 
 
 class FiguraView:
+
     def gerar_grafico_total_por_canal_turno(self, dataframe: pd.DataFrame, coluna_analise: str):
         st.dataframe(dataframe)
 
@@ -44,15 +45,31 @@ class FiguraView:
 
         dataframe['dia_da_semana'] = pd.Categorical(
             dataframe['dia_da_semana'], categories=dias_semana_ordenacao, ordered=True)
-        fig = px.bar(dataframe, y=f'{coluna_analise}_dia',
-                     x='dia_da_semana')
+        fig = px.bar(
+            dataframe,
+            y=f'{coluna_analise}_dia',
+            x='dia_da_semana',
+            text=f'{coluna_analise}_dia'
+        )
+
+        fig.update_traces(
+            textposition='outside',
+            hovertemplate=(
+
+                "<b>Dia da Semana:</b> %{x}<br>"
+                "<b>Total:</b> %{y}<br>"
+                "<extra></extra>"
+            )
+        )
         fig.update_layout(
+            xaxis_title='Dias da Semana',
+            yaxis_title='Total por Canal',
             yaxis=dict(
                 categoryorder='array',
                 categoryarray=dias_semana_ordenacao
-            )
+            ),
+            bargap=0.6
         )
-
         st.plotly_chart(fig)
 
     def gerar_grafico_video_visualizacoes(self, dataframe: pd.DataFrame, coluna_analise: str):
