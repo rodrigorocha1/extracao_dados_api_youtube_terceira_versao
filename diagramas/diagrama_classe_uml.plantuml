@@ -1,0 +1,70 @@
+@startuml  
+package main {
+
+    package hook {
+
+        abstract class YoutubeHook {
+            # String con_id
+            # String URL 
+            
+            # {abstract} criar_url(): String
+            # executar_paginacao(url, session, params): String
+            + conectar_api(url, params, session)
+            + run()
+        }
+
+        class YoutubeBuscaAssuntoHook extends YoutubeHook {
+            # String data_publicacao
+            # String assunto_pesquisa
+
+        }
+
+        class YoutubeBuscaCanaisHook extends YoutubeHook {
+            
+        }
+
+        class YoutubeVideoHook extends YoutubeHook {
+
+        }
+
+    }
+
+    package operators {
+
+    }
+
+    package src {
+        package dados{
+            interface IoperacaoDados<T> {
+                + {abstract} salvar_dados(dados: T): void <<abstract>>
+                + {abstract} carregar_dados(): T <<abstract>>
+            }
+
+            abstract class Arquivo extends IoperacaoDados {
+                # String caminho_base
+                # String pasta_datalake
+                # String camada_datalake
+                # String caminho_path_data
+                # String assunto
+                # String metrica
+                # String nome_arquivo
+                # String diretorio_completo
+
+                + {abstract} salvar_dados(dados: T): void
+                + {abstract} carregar_dados()
+            }
+
+            class ArquivoJson extends Arquivo {
+
+            }
+
+            class ArquivoPicke extends Arquivo {
+                
+            }
+        }
+    }
+
+    
+
+}
+@enduml
