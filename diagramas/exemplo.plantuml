@@ -1,0 +1,24 @@
+@startuml
+
+' Pacote para Endereço
+package "Modulo Endereco" {
+    class Endereco {
+        +logradouro: String
+        +cidade: String
+    }
+}
+
+' Pacote para Pessoa
+package "Modulo Pessoa" {
+    class Pessoa {
+        +nome: String
+        +idade: int
+        +pessoa_endereco: Endereco
+    }
+}
+
+' Relações entre os pacotes
+' Modulo Pessoa::Pessoa "1" -- "1..*" Modulo Endereco::Endereco : tem
+' Modulo Pessoa::Pessoa ..> Modulo Endereco::Endereco : usa
+
+@enduml

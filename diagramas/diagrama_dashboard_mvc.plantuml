@@ -1,0 +1,113 @@
+@startuml
+
+    package main {
+        package src {
+            package config {
+                package config_banco {
+                    class ConexaoBancoHive{
+                        # String host
+                        # String port
+                        # String database
+                        # String url_banco
+                        # String conexao
+                        # String Sessao
+
+                        obter_conexao()
+                        obter_sessao()
+                        
+                    }
+
+                    
+                }
+
+            }
+
+            
+
+            package model {
+                class Medida {
+                    # ConexaoBancoHive db 
+                    # conexao
+                    # sessao
+
+                    + obter_depara_video(assunto, flag, titulo_video, id_canal, id_video): Dataframe
+                    + obter_depara_canal(assunto, flag, nm_canal): Dataframe
+                    + obter_dados_canal_turno(assunto, id_canal, coluna_analise): Dataframe
+                    + obter_dado_canal_dia(assunto, id_canal, coluna_analise): Dataframe
+                    + obter_total_video_turno(id_video, assunto, coluna_analise): Dataframe
+                    + obter_media_taxa_engajamento_cana_total_inscritos(assunto, ids_canal): Dataframe
+                    + obter_media_engajamento_canal_visualizacoes(ids_canal, assunto): Dataframe
+                 
+                }
+
+
+                
+
+            }
+
+            package view {
+
+                class DashboardView {
+                    - DashboardController controller
+                    - FiguraView figura_view
+                    - String cor_total_visualizacoes
+                    - String cor_total_likes
+                    - String cor_taxa_engajamento_video
+                    - String cor_taxa_engajamento_inscritos
+                    - String cor_total_comentarios
+                    - String cor_total_inscritos
+                    - String cor_total_video
+                    - Integer flag_input_canal
+                    - Integer flag_input_video
+
+                    + gerar_layout_assunto(): assunto
+                    + gerar_layout_analise_canais(assunto)
+                    + gerar_layout_analise_video(assunto)
+                    + gerar_layout_taxa_engajamento(assunto)
+                    + rodar_dashboard()
+                }
+
+                class FiguraView {
+                    - Integer altura
+                    - Integer largura
+                    - Integer fonte_tamanho_hover_lavel
+                    - Integer fonte_tamanho_titulo
+                    - cores_turno
+
+                    + gerar_grafico_total_por_canal_turno(dataframe, coluna_analise): void
+                    + gerar_grafico_total_por_canal_dia(dataframe, coluna_analise, cor_grafico): void
+                    + gerar_grafico_video_visualizacoes(dataframe, coluna_analise): void
+                    + gerar_grafico_taxa_engajamento_total_inscritos(dataframe, coluna_analise, cor_grafico, coluna_separacao_cor): void
+                }
+
+            }
+
+
+            package controller {
+                class DashboardController {
+                    - Medida model
+        
+                    + listar_canais_assunto(assunto: str, flag_input_canal: int = 1): Tuple[str]
+                    + gerar_resultado_total_canais(assunto: str, coluna_analise: str, dado_canal: str, flag_turno: int = 1, flag_input_canal: int = 1): pd.DataFrame
+                    + gerar_canal_input_multiplos(assunto: str, flag_input: int): List[str]
+                    + listar_video_assunto(assunto: str): Tuple[str]
+                    + listar_canal_video_assunto(assunto: str): Tuple[str]
+                    + gerar_resultados_videos(assunto: str, titulo_video: str, coluna_analise: str, flag_input: int): pd.DataFrame
+                    + listar_inputs_canal_video_assunto(nome_canal: str, assunto: str, flag_input_canal: int): Tuple[str]
+                    + gerar_layout_total_engagamento_canais(assunto: str, nome_canal: List[str], flag_input: int): pd.DataFrame
+                    + gerar_layout_total_engajamento_inscritos(assunto: str, nome_canal: List[str], flag_input: int): pd.DataFrame
+                    + gerar_inputs_multiplos_videos(nome_canal: List[str], assunto: str): List[str]
+                }
+               
+                
+            }
+
+            Medida *-- "1" ConexaoBancoHive : contém
+            DashboardController <-- "1" Medida : usa
+            DashboardView <-- "1" FiguraView: Gera
+            DashboardView <-- "1" DashboardController: usa
+         
+        }
+    }
+
+@enduml
