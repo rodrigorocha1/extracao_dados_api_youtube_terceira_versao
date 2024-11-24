@@ -1,4 +1,4 @@
-@startuml  
+@startuml
 package main {
 
     package hook {
@@ -16,21 +16,42 @@ package main {
         class YoutubeBuscaAssuntoHook extends YoutubeHook {
             # String data_publicacao
             # String assunto_pesquisa
-
         }
 
         class YoutubeBuscaCanaisHook extends YoutubeHook {
-            
+            # IoperacaoDados operacao_arquivo_pkl 
         }
 
         class YoutubeVideoHook extends YoutubeHook {
-
+            # IoperacaoDados carregar_canais_brasileiros
+            # IoperacaoDados carregar_dados
         }
 
     }
 
     package operators {
+        abstract class YoutubeOperator {
+            # YoutubeHook operacao_hook
+            # ArquivoJson arquivo_json
+            # String assunto
+            # ArquivoPicke arquivo_pkl_canal_video 
+            # ArquivoPicke arquivo_pkl_canal
+            # String task_id
 
+            + {abstract} gravar_dados(req)
+            + {abstract} execute(context)
+        }
+
+        class YoutubeVideoOperator extends YoutubeOperator {
+
+        }
+        class YoutubeBuscaCanaisOperator extends YoutubeOperator {
+
+        }
+
+        class YoutubeBuscaOperator extends YoutubeOperator {
+            
+        }
     }
 
     package src {
@@ -40,7 +61,7 @@ package main {
                 + {abstract} carregar_dados(): T <<abstract>>
             }
 
-            abstract class Arquivo extends IoperacaoDados {
+            abstract class Arquivo implements IoperacaoDados {
                 # String caminho_base
                 # String pasta_datalake
                 # String camada_datalake
@@ -51,7 +72,7 @@ package main {
                 # String diretorio_completo
 
                 + {abstract} salvar_dados(dados: T): void
-                + {abstract} carregar_dados()
+                + {abstract} carregar_dados(): T
             }
 
             class ArquivoJson extends Arquivo {
@@ -59,12 +80,17 @@ package main {
             }
 
             class ArquivoPicke extends Arquivo {
-                
+
             }
         }
+
+ 
+        YoutubeBuscaCanaisHook --> "1" IoperacaoDados : usa
+        YoutubeVideoHook  --> "1.." IoperacaoDados : usa
+
+        YoutubeOperator  --> "1" YoutubeHook: usa
+
+        YoutubeOperator --> "1..*"  IoperacaoDados : usa
     }
-
-    
-
 }
 @enduml
