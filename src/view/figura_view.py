@@ -9,6 +9,11 @@ class FiguraView:
         self.__largura = 800
         self.__fonte_tamanho_hover_lavel = 14
         self.__fonte_tamanho_titulo = 14
+        self.__cores_turno = {
+            'Manhã': 'rgb(255, 223, 0)',  # Amarelo
+            'Tarde': 'rgb(255, 87, 34)',   # Laranja
+            'Noite': 'rgb(33, 150, 243)'   # Azul
+        }
 
     def gerar_grafico_total_por_canal_turno(self, dataframe: pd.DataFrame, coluna_analise: str):
         st.dataframe(dataframe)
@@ -91,8 +96,52 @@ class FiguraView:
             y=coluna_turno,
             color='turno_extracao',
             barmode='group',
+            text=coluna_turno,
             category_orders={'turno_extracao': turno_ordem},
+            color_discrete_map=self.__cores_turno,
+            custom_data=['turno_extracao']
         )
+
+        hover_template = (
+            "<b>Dia da Semana:</b> %{x}<br>"
+            "<b>Turno:</b> %{customdata[0]}<br>"
+            "<b>Visualizações:</b> %{y}<br>"
+            "<extra></extra>"
+        )
+
+        fig.update_traces(
+            hovertemplate=hover_template,
+            textposition='outside'
+        )
+
+        fig.update_layout(
+            xaxis_title='Dias da Semana',
+            yaxis_title=coluna_analise,
+            yaxis=dict(
+                categoryorder='array',
+                categoryarray=dias_semana_ordenacao
+            ),
+            bargap=0.1,
+            width=self.__largura + 100,
+            height=self.__altura,
+            hoverlabel=dict(
+                font_size=self.__fonte_tamanho_hover_lavel,
+                font_family="Arial"
+            ),
+            legend=dict(
+                title='Turno de Extração',
+                font=dict(
+                    family="Arial",
+                    size=12
+                ),
+                orientation="v",
+                yanchor="top",
+                y=1,
+                xanchor="left",
+                x=1.05
+            )
+        )
+
         st.plotly_chart(fig)
 
     def gerar_grafico_taxa_engajamento_total_inscritos(self, dataframe: pd.DataFrame, coluna_analise=str):

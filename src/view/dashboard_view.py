@@ -205,7 +205,7 @@ class DashboardView:
                 dataframe = self.__controller.gerar_resultados_videos(
                     assunto=assunto, titulo_video=videos, coluna_analise=coluna_analise)
                 self.__figura_view.gerar_grafico_video_visualizacoes(
-                    dataframe=dataframe, coluna_analise=coluna_analise)
+                    dataframe=dataframe, coluna_analise=coluna_analise,)
             with tab2:
                 coluna_analise = 'total_likes'
                 input_canais = self.__controller.listar_canais_assunto(
@@ -227,7 +227,7 @@ class DashboardView:
                 dataframe = self.__controller.gerar_resultados_videos(
                     assunto=assunto, titulo_video=videos, coluna_analise=coluna_analise)
                 self.__figura_view.gerar_grafico_video_visualizacoes(
-                    dataframe=dataframe, coluna_analise=coluna_analise)
+                    dataframe=dataframe, coluna_analise=coluna_analise,)
             with tab3:
                 coluna_analise = 'total_comentarios'
                 input_canais = self.__controller.listar_canais_assunto(
@@ -249,7 +249,7 @@ class DashboardView:
                 dataframe = self.__controller.gerar_resultados_videos(
                     assunto=assunto, titulo_video=videos, coluna_analise=coluna_analise)
                 self.__figura_view.gerar_grafico_video_visualizacoes(
-                    dataframe=dataframe, coluna_analise=coluna_analise)
+                    dataframe=dataframe, coluna_analise=coluna_analise,)
 
     def gerar_layout_taxa_engajamento(self, assunto: str):
         with st.container():
