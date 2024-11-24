@@ -90,15 +90,21 @@ class DashboardController:
             assunto=assunto, coluna_analise=coluna_analise, id_video=id_video)
         return dataframe
 
-    def listar_inputs_canal_video_assunto(self, nome_canal: str, assunto: str) -> Tuple[str]:
-        id_canal = self.__model.obter_depara_canal(
-            assunto=assunto, flag=2, nm_canal=nome_canal)
-        id_canal = id_canal.to_string().split(' ')[-1]
+    def listar_inputs_canal_video_assunto(self, nome_canal: str, assunto: str, flag_input_canal: int) -> Tuple[str]:
+        print('flag_input_canal', flag_input_canal)
+        if flag_input_canal == 1:
+            id_canal = nome_canal
+            dataframe = self.__model.obter_depara_video(
+                assunto=assunto, flag=5, titulo_video=None, id_canal=id_canal)
+            titulos_video = tuple(dataframe['id_video'].to_list())
+        else:
+            id_canal = self.__model.obter_depara_canal(
+                assunto=assunto, flag=2, nm_canal=nome_canal)
+            id_canal = id_canal.to_string().split(' ')[-1]
+            dataframe = self.__model.obter_depara_video(
+                assunto=assunto, flag=3, titulo_video=None, id_canal=id_canal)
+            titulos_video = tuple(dataframe['titulo_video'].to_list())
 
-        dataframe = self.__model.obter_depara_video(
-            assunto=assunto, flag=3, titulo_video=None, id_canal=id_canal)
-
-        titulos_video = tuple(dataframe['titulo_video'].to_list())
         return titulos_video
 
     def gerar_layout_total_engagamento_canais(self, assunto: str, nome_canal: List[str]) -> pd.DataFrame:

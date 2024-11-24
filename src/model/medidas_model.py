@@ -84,7 +84,7 @@ class Medida:
             tipos = {
                 'titulo_video': 'string'
             }
-        else:
+        elif flag == 4:
             video_placeholder = ', '.join(['%s'] * len(titulo_video))
             parametros = (assunto, *titulo_video)
             sql = f"""
@@ -95,6 +95,20 @@ class Medida:
                 WHERE
                     assunto = %s
                     AND titulo_video IN ({video_placeholder})
+            """
+            tipos = {
+                'id_video': 'string'
+            }
+        else:
+            parametros = (assunto, id_canal)
+            sql = f"""
+                SELECT
+                    id_video
+                FROM
+                    depara_video
+                WHERE
+                    assunto = %s
+                    AND id_canal = %s
             """
             tipos = {
                 'id_video': 'string'
