@@ -99,7 +99,8 @@ class FiguraView:
             text=coluna_turno,
             category_orders={'turno_extracao': turno_ordem},
             color_discrete_map=self.__cores_turno,
-            custom_data=['turno_extracao']
+            custom_data=['turno_extracao'],
+            title=f'Análise dados Vídeo {coluna_turno.replace("_", " ").capitalize()}'
         )
 
         hover_template = (
@@ -150,7 +151,7 @@ class FiguraView:
 
         st.plotly_chart(fig)
 
-    def gerar_grafico_taxa_engajamento_total_inscritos(self, dataframe: pd.DataFrame, coluna_analise=str):
+    def gerar_grafico_taxa_engajamento_total_inscritos(self, dataframe: pd.DataFrame, coluna_analise: str, cor_grafico: str):
         st.dataframe(dataframe)
 
         if coluna_analise not in dataframe.columns:
@@ -178,6 +179,53 @@ class FiguraView:
             x='dia_da_semana',
             y=coluna_analise,
             barmode='group',
+            text=coluna_analise,
+            title='Análise taxa engajamento'
 
         )
+        hover_template = (
+            "<b>Dia da Semana:</b> %{x}<br>"
+            "<b>Média taxa engajamento:</b> %{y}<br>"
+            "<extra></extra>"
+        )
+        fig.update_traces(
+            hovertemplate=hover_template,
+            textposition='outside'
+        )
+
+        fig.update_layout(
+            xaxis_title='Dias da Semana',
+            yaxis_title=coluna_analise,
+            yaxis=dict(
+                categoryorder='array',
+                categoryarray=dias_semana_ordenacao
+            ),
+            bargap=0.1,
+            marker=dict(color=cor_grafico),
+            width=self.__largura + 350,
+            height=self.__altura,
+            hoverlabel=dict(
+                font_size=self.__fonte_tamanho_hover_lavel,
+                font_family="Arial"
+            ),
+            legend=dict(
+                title='Turno de Extração',
+                font=dict(
+                    family="Arial",
+                    size=12
+                ),
+                orientation="v",
+                yanchor="top",
+                y=1,
+                xanchor="left",
+                x=1.05
+            ),
+            margin=dict(
+                l=300,  # Margem esquerda
+                # r=50,  # Margem direita
+                # t=50,  # Margem superior
+                # b=50   # Margem inferior
+            )
+        )
+
         st.plotly_chart(fig)

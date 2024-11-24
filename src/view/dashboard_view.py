@@ -13,6 +13,7 @@ class DashboardView:
         self.__figura_view = FiguraView()
         self.__cor_total_visualizacoes = '#64E5A7'
         self.__cor_total_likes = '#FFB93F'
+        self.__cor_taxa_engajamento = '#FFB93F'
         self.__cor_total_comentarios = '#4E49F3'
         self.__cor_total_inscritos = '#4FD9F7'
         self.__cor_total_video = '#C72341'
@@ -293,6 +294,6 @@ class DashboardView:
 
     def rodar_dashboard(self):
         assunto = self.gerar_layout_assunto()
-        self.gerar_layout_analise_canais(assunto=assunto)
-        self.gerar_layout_analise_video(assunto=assunto)
+        # self.gerar_layout_analise_canais(assunto=assunto)
+        # self.gerar_layout_analise_video(assunto=assunto)
         self.gerar_layout_taxa_engajamento(assunto=assunto)
