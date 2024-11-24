@@ -122,7 +122,7 @@ class FiguraView:
                 categoryarray=dias_semana_ordenacao
             ),
             bargap=0.1,
-            width=self.__largura + 250,
+            width=self.__largura + 350,
             height=self.__altura,
             hoverlabel=dict(
                 font_size=self.__fonte_tamanho_hover_lavel,
