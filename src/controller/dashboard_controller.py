@@ -8,35 +8,46 @@ class DashboardController:
     def __init__(self):
         self.__model = Medida()
 
-    def listar_canais_assunto(self,  assunto: str) -> Tuple[str]:
+    def listar_canais_assunto(self,  assunto: str, flag_input_canal: int = 1) -> Tuple[str]:
         """Método para listar canais
 
         Args:
             assunto (str): assunto
+            flag_input_canal (int, optional): Flag para trocar o input canal  1 - Exibir  id_canal - 2 exibir nome canal. Defaults to 1. 
 
         Returns:
-            Tuple[str]: tupla com os nomes dos canais
+            Tuple[str]: Tupla com id canal ou com o nome canal
         """
+
         dataframe = self.__model.obter_depara_canal(
             assunto=assunto, flag=1, nm_canal=None)
-        dados_canal = tuple(dataframe['nm_canal'].to_list())
+        if flag_input_canal == 1:
+            dados_canal = tuple(dataframe['id_canal'].tolist())
+        else:
+            dados_canal = tuple(dataframe['nm_canal'].to_list())
+
         return dados_canal
 
-    def gerar_resultado_total_canais(self, assunto: str, coluna_analise: str, nome_canal: str, flag_turno: int = 1) -> pd.DataFrame:
+    def gerar_resultado_total_canais(self, assunto: str, coluna_analise: str, dado_canal: str, flag_turno: int = 1,  flag_input_canal: int = 1) -> pd.DataFrame:
         """Método para gerar restultado canais turno
 
         Args:
             assunto (str): assunto de pesquisa
             coluna_analise (str): [total_visualizacoes, total_inscritos, total_videos_publicados]
-            nome_canal (str): nome do canal
+            dado_canal (str): pode ser o nome do canal ou id canal
             flag_turno (int, optional): Direcionameto para consultar dados por turno ou por dia: 1-Turno/2-Dia. Defaults to 1.
-
+            flag_input_canal (int, optional): Flag para trocar o input canal  1 - Exibir  id_canal - 2 exibir nome canal. Defaults to 1.
         Returns:
             pd.DataFrame: _description_
         """
-        id_canal = self.__model.obter_depara_canal(
-            assunto=assunto, flag=2, nm_canal=nome_canal)
-        id_canal = id_canal.to_string().split(' ')[-1]
+        if flag_input_canal == 2:
+
+            id_canal = self.__model.obter_depara_canal(
+                assunto=assunto, flag=2, nm_canal=dado_canal)
+
+            id_canal = id_canal.to_string().split(' ')[-1]
+        else:
+            id_canal = dado_canal
         if flag_turno == 1:
             dataframe = self.__model.obter_dados_canal_turno(
                 assunto=assunto, id_canal=id_canal, coluna_analise=coluna_analise)

@@ -19,6 +19,7 @@ class DashboardView:
         self.__cor_total_inscritos = '#4FD9F7'
         self.__cor_total_video = '#C72341'
         self.__flag_input_canal = 2  # 1 - Exibir  id_canal - 2 exibir nome canal
+        self.__flag_input_videol = 1  # 1 - Exibir  id_video - 2 exibir nome video
 
     def gerar_layout_assunto(self):
         with st.container():
@@ -297,6 +298,6 @@ class DashboardView:
 
     def rodar_dashboard(self):
         assunto = self.gerar_layout_assunto()
-        self.gerar_layout_analise_canais(assunto=assunto)
-        # self.gerar_layout_analise_video(assunto=assunto)
+        # self.gerar_layout_analise_canais(assunto=assunto)
+        self.gerar_layout_analise_video(assunto=assunto)
         # self.gerar_layout_taxa_engajamento(assunto=assunto)
