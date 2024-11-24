@@ -52,9 +52,6 @@ class FiguraView:
         st.plotly_chart(fig)
 
     def gerar_grafico_video_visualizacoes(self, dataframe: pd.DataFrame, coluna_analise: str):
-        ######
-        st.dataframe(dataframe)
-
         coluna_turno = f'{coluna_analise}_turno'
 
         if coluna_turno not in dataframe.columns:
