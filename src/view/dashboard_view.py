@@ -19,7 +19,7 @@ class DashboardView:
         self.__cor_total_inscritos = '#4FD9F7'
         self.__cor_total_video = '#C72341'
         self.__flag_input_canal = 2  # 1 - Exibir  id_canal - 2 exibir nome canal
-        self.__flag_input_videol = 1  # 1 - Exibir  id_video - 2 exibir nome video
+        self.__flag_input_video = 1  # 1 - Exibir  id_video - 2 exibir nome video
 
     def gerar_layout_assunto(self):
         with st.container():
@@ -117,63 +117,84 @@ class DashboardView:
                     self.__figura_view.gerar_grafico_total_por_canal_turno(
                         dataframe=dataframe, coluna_analise=coluna_analise)
 
-            # with col2:
+            with col2:
 
-            #     st.markdown(
-            #         """
-            #             <div style="text-align: center;">
-            #                 <strong>Total vísualizações/inscritos/videos_publicado por dia canal</strong>
-            #             </div>
-            #         """,
-            #         unsafe_allow_html=True
-            #     )
+                st.markdown(
+                    """
+                        <div style="text-align: center;">
+                            <strong>Total vísualizações/inscritos/videos_publicado por dia canal</strong>
+                        </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
-            #     tab1, tab2, tab3 = st.tabs(
-            #         ['Total vísualizações', 'Total Inscritos', 'Total Vídeo']
-            #     )
-            #     with tab1:
-            #         coluna_analise = 'total_visualizacoes'
-            #         input_canais = self.__controller.listar_canais_assunto(
-            #             assunto=assunto)
-            #         canais = st.selectbox(
-            #             'selecione o canal',
-            #             input_canais,
-            #             placeholder='selecione os canais',
-            #             key=4
-            #         )
-            #         dataframe = self.__controller.gerar_resultado_total_canais(
-            #             coluna_analise=coluna_analise, assunto=assunto, nome_canal=canais, flag_turno=2)
-            #         self.__figura_view.gerar_grafico_total_por_canal_dia(
-            #             dataframe=dataframe, coluna_analise=coluna_analise, cor_grafico=self.__cor_total_visualizacoes)
+                tab1, tab2, tab3 = st.tabs(
+                    ['Total vísualizações', 'Total Inscritos', 'Total Vídeo']
+                )
+                with tab1:
+                    coluna_analise = 'total_visualizacoes'
+                    input_canais = self.__controller.listar_canais_assunto(
+                        assunto=assunto,
+                        flag_input_canal=self.__flag_input_canal
+                    )
+                    canais = st.selectbox(
+                        'selecione o canal',
+                        input_canais,
+                        placeholder='selecione os canais',
+                        key=4
+                    )
+                    dataframe = self.__controller.gerar_resultado_total_canais(
+                        coluna_analise=coluna_analise,
+                        assunto=assunto,
+                        dado_canal=canais,
+                        flag_turno=2,
+                        flag_input_canal=self.__flag_input_canal
+                    )
+                    self.__figura_view.gerar_grafico_total_por_canal_dia(
+                        dataframe=dataframe, coluna_analise=coluna_analise, cor_grafico=self.__cor_total_visualizacoes)
 
-            #     with tab2:
-            #         coluna_analise = 'total_inscritos'
-            #         input_canais = self.__controller.listar_canais_assunto(
-            #             assunto=assunto)
-            #         canais = st.selectbox(
-            #             'selecione o canal',
-            #             input_canais,
-            #             placeholder='selecione os canais',
-            #             key=5
-            #         )
-            #         dataframe = self.__controller.gerar_resultado_total_canais(
-            #             coluna_analise=coluna_analise, assunto=assunto, nome_canal=canais, flag_turno=2)
-            #         self.__figura_view.gerar_grafico_total_por_canal_dia(
-            #             dataframe=dataframe, coluna_analise=coluna_analise, cor_grafico=self.__cor_total_inscritos)
-            #     with tab3:
-            #         coluna_analise = 'total_videos_publicados'
-            #         input_canais = self.__controller.listar_canais_assunto(
-            #             assunto=assunto)
-            #         canais = st.selectbox(
-            #             'selecione o canal',
-            #             input_canais,
-            #             placeholder='selecione os canais',
-            #             key=6
-            #         )
-            #         dataframe = self.__controller.gerar_resultado_total_canais(
-            #             coluna_analise=coluna_analise, assunto=assunto, nome_canal=canais, flag_turno=2)
-            #         self.__figura_view.gerar_grafico_total_por_canal_dia(
-            #             dataframe=dataframe, coluna_analise=coluna_analise, cor_grafico=self.__cor_total_video)
+                with tab2:
+                    coluna_analise = 'total_inscritos'
+                    input_canais = self.__controller.listar_canais_assunto(
+                        assunto=assunto,
+                        flag_input_canal=self.__flag_input_canal
+                    )
+                    canais = st.selectbox(
+                        'selecione o canal',
+                        input_canais,
+                        placeholder='selecione os canais',
+                        key=5
+                    )
+                    dataframe = self.__controller.gerar_resultado_total_canais(
+                        coluna_analise=coluna_analise,
+                        assunto=assunto,
+                        dado_canal=canais,
+                        flag_turno=2,
+                        flag_input_canal=self.__flag_input_canal
+                    )
+                    self.__figura_view.gerar_grafico_total_por_canal_dia(
+                        dataframe=dataframe, coluna_analise=coluna_analise, cor_grafico=self.__cor_total_inscritos)
+                with tab3:
+                    coluna_analise = 'total_videos_publicados'
+                    input_canais = self.__controller.listar_canais_assunto(
+                        assunto=assunto,
+                        flag_input_canal=self.__flag_input_canal
+                    )
+                    canais = st.selectbox(
+                        'selecione o canal',
+                        input_canais,
+                        placeholder='selecione os canais',
+                        key=6
+                    )
+                    dataframe = self.__controller.gerar_resultado_total_canais(
+                        coluna_analise=coluna_analise,
+                        assunto=assunto,
+                        dado_canal=canais,
+                        flag_turno=2,
+                        flag_input_canal=self.__flag_input_canal
+                    )
+                    self.__figura_view.gerar_grafico_total_por_canal_dia(
+                        dataframe=dataframe, coluna_analise=coluna_analise, cor_grafico=self.__cor_total_video)
 
     def gerar_layout_analise_video(self, assunto: str):
         st.write('Análise vídeo')
@@ -189,7 +210,9 @@ class DashboardView:
                 coluna_analise = 'total_visualizacoes'
 
                 input_canais = self.__controller.listar_canais_assunto(
-                    assunto=assunto)
+                    assunto=assunto,
+                    flag_input_canal=self.__flag_input_canal
+                )
 
                 canais = st.selectbox(
                     'selecione o canal',
@@ -198,7 +221,10 @@ class DashboardView:
                     key=7
                 )
                 titulo_video = self.__controller.listar_inputs_canal_video_assunto(
-                    assunto=assunto, nome_canal=canais)
+                    assunto=assunto,
+                    nome_canal=canais,
+                    flag_input_canal=self.__flag_input_canal
+                )
 
                 videos = st.selectbox(
                     'Escolha o vídeo ',
@@ -207,13 +233,19 @@ class DashboardView:
                     key=8
                 )
                 dataframe = self.__controller.gerar_resultados_videos(
-                    assunto=assunto, titulo_video=videos, coluna_analise=coluna_analise)
+                    assunto=assunto,
+                    titulo_video=videos,
+                    coluna_analise=coluna_analise,
+                    flag_input=self.__flag_input_canal
+                )
                 self.__figura_view.gerar_grafico_video_visualizacoes(
                     dataframe=dataframe, coluna_analise=coluna_analise,)
             with tab2:
                 coluna_analise = 'total_likes'
                 input_canais = self.__controller.listar_canais_assunto(
-                    assunto=assunto)
+                    assunto=assunto,
+                    flag_input_canal=self.__flag_input_canal
+                )
                 canais = st.selectbox(
                     'selecione o canal',
                     input_canais,
@@ -221,7 +253,10 @@ class DashboardView:
                     key=9
                 )
                 titulo_video = self.__controller.listar_inputs_canal_video_assunto(
-                    assunto=assunto, nome_canal=canais)
+                    assunto=assunto,
+                    nome_canal=canais,
+                    flag_input_canal=self.__flag_input_canal
+                )
                 videos = st.selectbox(
                     'Escolha o vídeo ',
                     titulo_video,
@@ -229,13 +264,19 @@ class DashboardView:
                     key=10
                 )
                 dataframe = self.__controller.gerar_resultados_videos(
-                    assunto=assunto, titulo_video=videos, coluna_analise=coluna_analise)
+                    assunto=assunto,
+                    titulo_video=videos,
+                    coluna_analise=coluna_analise,
+                    flag_input=self.__flag_input_canal
+                )
                 self.__figura_view.gerar_grafico_video_visualizacoes(
                     dataframe=dataframe, coluna_analise=coluna_analise,)
             with tab3:
                 coluna_analise = 'total_comentarios'
                 input_canais = self.__controller.listar_canais_assunto(
-                    assunto=assunto)
+                    assunto=assunto,
+                    flag_input_canal=self.__flag_input_canal
+                )
                 canais = st.selectbox(
                     'selecione o canal',
                     input_canais,
@@ -243,7 +284,10 @@ class DashboardView:
                     key=11
                 )
                 titulo_video = self.__controller.listar_inputs_canal_video_assunto(
-                    assunto=assunto, nome_canal=canais)
+                    assunto=assunto,
+                    nome_canal=canais,
+                    flag_input_canal=self.__flag_input_canal
+                )
                 videos = st.selectbox(
                     'Escolha o vídeo ',
                     titulo_video,
@@ -251,9 +295,15 @@ class DashboardView:
                     key=12
                 )
                 dataframe = self.__controller.gerar_resultados_videos(
-                    assunto=assunto, titulo_video=videos, coluna_analise=coluna_analise)
+                    assunto=assunto,
+                    titulo_video=videos,
+                    coluna_analise=coluna_analise,
+                    flag_input=self.__flag_input_canal
+                )
                 self.__figura_view.gerar_grafico_video_visualizacoes(
-                    dataframe=dataframe, coluna_analise=coluna_analise,)
+                    dataframe=dataframe,
+                    coluna_analise=coluna_analise,
+                )
 
     def gerar_layout_taxa_engajamento(self, assunto: str):
         with st.container():
@@ -268,7 +318,9 @@ class DashboardView:
             with tab1:
                 st.write('Média engajamento  do  canal por visualização')
                 lista_canais = self.__controller.gerar_canal_input_multiplos(
-                    assunto=assunto)
+                    assunto=assunto,
+                    flag_input=self.__flag_input_canal
+                )
                 nome_canais = st.multiselect(
                     'Escolha um ou mais canais',
                     lista_canais,
@@ -277,27 +329,52 @@ class DashboardView:
                 )
 
                 dataframe = self.__controller.gerar_layout_total_engagamento_canais(
-                    assunto=assunto, nome_canal=nome_canais)
+                    assunto=assunto,
+                    nome_canal=nome_canais,
+                    flag_input=self.__flag_input_canal
+                )
+
+                if self.__flag_input_canal == 1:
+                    coluna = 'id_canal'
+                else:
+                    coluna = 'nm_canal'
                 self.__figura_view.gerar_grafico_taxa_engajamento_total_inscritos(
-                    dataframe=dataframe, coluna_analise='media_taxa_engajamento',
-                    cor_grafico=self.__cor_taxa_engajamento_video, )
+                    dataframe=dataframe,
+                    coluna_analise='media_taxa_engajamento',
+                    cor_grafico=self.__cor_taxa_engajamento_video,
+                    coluna_separacao_cor=coluna
+                )
             with tab2:
                 st.write('Média engajamento do total por inscritos')
                 lista_canais = self.__controller.gerar_canal_input_multiplos(
-                    assunto=assunto)
+                    assunto=assunto,
+                    flag_input=self.__flag_input_canal
+                )
                 nome_canais = st.multiselect(
                     'Escolha um ou mais canais',
                     lista_canais,
                     lista_canais[0],
                     key=14
                 )
+                if self.__flag_input_canal == 1:
+                    coluna = 'id_canal'
+                else:
+                    coluna = 'nm_canal'
                 dataframe = self.__controller.gerar_layout_total_engajamento_inscritos(
-                    assunto=assunto, nome_canal=nome_canais)
+                    assunto=assunto,
+                    nome_canal=nome_canais,
+                    flag_input=self.__flag_input_canal
+
+                )
                 self.__figura_view.gerar_grafico_taxa_engajamento_total_inscritos(
-                    dataframe=dataframe, coluna_analise='media_taxa_engajamento', cor_grafico=self.__cor_taxa_engajamento_inscritos)
+                    dataframe=dataframe,
+                    coluna_analise='media_taxa_engajamento',
+                    cor_grafico=self.__cor_taxa_engajamento_inscritos,
+                    coluna_separacao_cor=coluna
+                )
 
     def rodar_dashboard(self):
         assunto = self.gerar_layout_assunto()
-        # self.gerar_layout_analise_canais(assunto=assunto)
+        self.gerar_layout_analise_canais(assunto=assunto)
         self.gerar_layout_analise_video(assunto=assunto)
-        # self.gerar_layout_taxa_engajamento(assunto=assunto)
+        self.gerar_layout_taxa_engajamento(assunto=assunto)

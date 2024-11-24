@@ -56,7 +56,7 @@ class DashboardController:
                 assunto=assunto, id_canal=id_canal, coluna_analise=coluna_analise)
         return dataframe
 
-    def gerar_canal_input_multiplos(self, assunto: str) -> List[str]:
+    def gerar_canal_input_multiplos(self, assunto: str, flag_input: int) -> List[str]:
         """Método para gerar lista de canais para input
 
         Args:
@@ -67,10 +67,21 @@ class DashboardController:
         """
         lista_canais = self.__model.obter_depara_canal(
             assunto=assunto, flag=1, nm_canal=None)
-        lista_canais = lista_canais['nm_canal'].to_list()
+        if flag_input == 1:
+            lista_canais = lista_canais['id_canal'].to_list()
+        else:
+            lista_canais = lista_canais['nm_canal'].to_list()
         return lista_canais
 
     def listar_video_assunto(self, assunto: str) -> Tuple[str]:
+        """Método para  recuperar assunto
+
+        Args:
+            assunto (str): assunto de pesquisa
+
+        Returns:
+            Tuple[str]: tupla com os assuntos
+        """
         dataframe = self.__model.obter_depara_video(
             assunto=assunto, flag=1, titulo_video=None, id_canal=None)
         canais = tuple(dataframe['titulo_video'].tolist())
@@ -82,10 +93,13 @@ class DashboardController:
         canais = tuple(dataframe['titulo_video'].tolist())
         return canais
 
-    def gerar_resultados_videos(self, assunto: str, titulo_video: str, coluna_analise: str) -> pd.DataFrame:
-        id_video = self.__model.obter_depara_video(
-            assunto=assunto, flag=2, titulo_video=titulo_video, id_canal=None)
-        id_video = id_video['id_video'].to_string().split(' ')[-1]
+    def gerar_resultados_videos(self, assunto: str, titulo_video: str, coluna_analise: str, flag_input: int) -> pd.DataFrame:
+        if flag_input == 1:
+            id_video = titulo_video
+        else:
+            id_video = self.__model.obter_depara_video(
+                assunto=assunto, flag=2, titulo_video=titulo_video, id_canal=None)
+            id_video = id_video['id_video'].to_string().split(' ')[-1]
         dataframe = self.__model.obter_total_dados_video_turno(
             assunto=assunto, coluna_analise=coluna_analise, id_video=id_video)
         return dataframe
@@ -107,19 +121,25 @@ class DashboardController:
 
         return titulos_video
 
-    def gerar_layout_total_engagamento_canais(self, assunto: str, nome_canal: List[str]) -> pd.DataFrame:
-        lista_id_canais = self.__model.obter_depara_canal(
-            assunto=assunto, flag=2, nm_canal=nome_canal)
-        lista_id_canais = lista_id_canais['id_canal'].to_list()
+    def gerar_layout_total_engagamento_canais(self, assunto: str, nome_canal: List[str], flag_input: int) -> pd.DataFrame:
+        if flag_input == 1:
+            lista_id_canais = nome_canal
+        else:
+            lista_id_canais = self.__model.obter_depara_canal(
+                assunto=assunto, flag=2, nm_canal=nome_canal)
+            lista_id_canais = lista_id_canais['id_canal'].to_list()
 
         dataframe = self.__model.obter_media_engajamento_canal_visualizacoes(
             assunto=assunto, ids_canal=lista_id_canais)
         return dataframe
 
-    def gerar_layout_total_engajamento_inscritos(self, assunto: str, nome_canal: List[str]):
-        lista_id_canais = self.__model.obter_depara_canal(
-            assunto=assunto, flag=2, nm_canal=nome_canal)
-        lista_id_canais = lista_id_canais['id_canal'].to_list()
+    def gerar_layout_total_engajamento_inscritos(self, assunto: str, nome_canal: List[str], flag_input: int):
+        if flag_input == 1:
+            lista_id_canais = nome_canal
+        else:
+            lista_id_canais = self.__model.obter_depara_canal(
+                assunto=assunto, flag=2, nm_canal=nome_canal)
+            lista_id_canais = lista_id_canais['id_canal'].to_list()
         dataframe = self.__model.obter_media_taxa_engajamento_canal_total_inscritos(
             assunto=assunto,
             ids_canal=lista_id_canais

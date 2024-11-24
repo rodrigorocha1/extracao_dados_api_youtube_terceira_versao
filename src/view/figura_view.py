@@ -151,7 +151,13 @@ class FiguraView:
 
         st.plotly_chart(fig)
 
-    def gerar_grafico_taxa_engajamento_total_inscritos(self, dataframe: pd.DataFrame, coluna_analise: str, cor_grafico: str):
+    def gerar_grafico_taxa_engajamento_total_inscritos(
+            self,
+            dataframe: pd.DataFrame,
+            coluna_analise: str,
+            cor_grafico: str,
+            coluna_separacao_cor: str
+    ):
 
         if coluna_analise not in dataframe.columns:
             st.write(f"A coluna '{coluna_analise}' não existe no DataFrame.")
@@ -180,7 +186,7 @@ class FiguraView:
             barmode='group',
             text=coluna_analise,
             title='Análise taxa engajamento',
-            color='nm_canal'
+            color=coluna_separacao_cor
 
         )
         hover_template = (
