@@ -8,38 +8,7 @@ class FiguraView:
     def gerar_grafico_total_por_canal_turno(self, dataframe: pd.DataFrame, coluna_analise: str):
         st.dataframe(dataframe)
 
-        coluna_turno = f'{coluna_analise}_turno'
-
-        if coluna_turno not in dataframe.columns:
-            st.write(f"A coluna '{coluna_turno}' não existe no DataFrame.")
-            return
-
-        if not (dataframe[coluna_turno] == 0).all():
-            turno_order = ['Manhã', 'Tarde', 'Noite']
-
-            dataframe['turno_extracao'] = pd.Categorical(
-                dataframe['turno_extracao'], categories=turno_order, ordered=True)
-            if dataframe.empty:
-                st.write("O DataFrame está vazio.")
-                return
-            fig = px.bar(
-                dataframe,
-                x='dia_da_semana',
-                y=coluna_turno,
-                color='turno_extracao',
-                barmode='group',
-                title=f'Análise Total por Canal e Turno - {coluna_analise.capitalize()}',
-                labels={
-                    'dia_da_semana': 'Dia da Semana',
-                    coluna_turno: 'Total por Turno',
-                    'turno_extracao': 'Turno'
-                }
-            )
-            st.plotly_chart(fig)
-        else:
-            st.write("Sem valores válidos na coluna.")
-
-    def gerar_grafico_total_por_canal_dia(self, dataframe: pd.DataFrame, coluna_analise: str):
+    def gerar_grafico_total_por_canal_dia(self, dataframe: pd.DataFrame, coluna_analise: str, cor_grafico: str):
         dias_semana_ordenacao = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira',
                                  'Quinta-feira', 'Sexta-feira', 'Sábado']
 
@@ -59,7 +28,11 @@ class FiguraView:
                 "<b>Dia da Semana:</b> %{x}<br>"
                 "<b>Total:</b> %{y}<br>"
                 "<extra></extra>"
-            )
+            ),
+            marker=dict(color=cor_grafico),
+            textfont=dict(
+                size=14
+            ),
         )
         fig.update_layout(
             xaxis_title='Dias da Semana',

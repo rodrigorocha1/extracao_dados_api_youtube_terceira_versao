@@ -11,6 +11,11 @@ class DashboardView:
     def __init__(self):
         self.__controller = DashboardController()
         self.__figura_view = FiguraView()
+        self.__cor_total_visualizacoes = '#64E5A7'
+        self.__cor_total_likes = '#FFB93F'
+        self.__cor_total_comentarios = '#4E49F3'
+        self.__cor_total_inscritos = '#4FD9F7'
+        self.__cor_total_video = '#C72341'
 
     def gerar_layout_assunto(self):
         with st.container():
@@ -135,7 +140,7 @@ class DashboardView:
                     dataframe = self.__controller.gerar_resultado_total_canais(
                         coluna_analise=coluna_analise, assunto=assunto, nome_canal=canais, flag_turno=2)
                     self.__figura_view.gerar_grafico_total_por_canal_dia(
-                        dataframe=dataframe, coluna_analise=coluna_analise)
+                        dataframe=dataframe, coluna_analise=coluna_analise, cor_grafico=self.__cor_total_visualizacoes)
 
                 with tab2:
                     coluna_analise = 'total_inscritos'
@@ -150,7 +155,7 @@ class DashboardView:
                     dataframe = self.__controller.gerar_resultado_total_canais(
                         coluna_analise=coluna_analise, assunto=assunto, nome_canal=canais, flag_turno=2)
                     self.__figura_view.gerar_grafico_total_por_canal_dia(
-                        dataframe=dataframe, coluna_analise=coluna_analise)
+                        dataframe=dataframe, coluna_analise=coluna_analise, cor_grafico=self.__cor_total_inscritos)
                 with tab3:
                     coluna_analise = 'total_videos_publicados'
                     input_canais = self.__controller.listar_canais_assunto(
@@ -164,7 +169,7 @@ class DashboardView:
                     dataframe = self.__controller.gerar_resultado_total_canais(
                         coluna_analise=coluna_analise, assunto=assunto, nome_canal=canais, flag_turno=2)
                     self.__figura_view.gerar_grafico_total_por_canal_dia(
-                        dataframe=dataframe, coluna_analise=coluna_analise)
+                        dataframe=dataframe, coluna_analise=coluna_analise, cor_grafico=self.__cor_total_video)
 
     def gerar_layout_analise_video(self, assunto: str):
         st.write('Análise vídeo')
