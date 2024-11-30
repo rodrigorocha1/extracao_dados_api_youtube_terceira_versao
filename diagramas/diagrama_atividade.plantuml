@@ -10,7 +10,7 @@ start
 
     partition "**processo** task_youtubee_api_canais" {
         : abrir_id_canais;
-        : abir_id_canais_videos;
+
         if (idioma_canal == "BR?") then (Sim)
             : gravar_canal_arquivo_pickle;
             : gravar_historico_canal;

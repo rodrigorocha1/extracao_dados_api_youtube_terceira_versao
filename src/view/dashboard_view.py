@@ -18,7 +18,7 @@ class DashboardView:
         self.__cor_total_comentarios = '#4E49F3'
         self.__cor_total_inscritos = '#4FD9F7'
         self.__cor_total_video = '#C72341'
-        self.__flag_input_canal = 2  # 1 - Exibir  id_canal - 2 exibir nome canal
+        self.__flag_input_canal = 1  # 1 - Exibir  id_canal - 2 exibir nome canal
         self.__flag_input_video = 1  # 1 - Exibir  id_video - 2 exibir nome video
 
     def gerar_layout_assunto(self):
