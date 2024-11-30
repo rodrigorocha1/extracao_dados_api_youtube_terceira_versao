@@ -1,0 +1,52 @@
+@startuml
+
+start
+    partition "**processo** task_youtubee_api_historico_pesquisa" {
+        : buscar_assunto;
+        : gravar_historico_datalake;
+        : gravar_id_canais;
+        : gravar_id_canais_id_videos;
+    }
+
+    partition "**processo** task_youtubee_api_canais" {
+        : abrir_id_canais;
+        : abir_id_canais_videos;
+        if (idioma_canal == "BR?") then (Sim)
+            : gravar_canal_arquivo_pickle;
+            : gravar_historico_canal;
+            : gravar_par_id_canal_id_video;
+            : gravar_id_canal_brasileiro;
+        else (Não)
+            : ignorar_canal;
+        endif;
+        
+    }
+    partition "**processo** task_youtubee_api_videos" {
+        : abrir_arquivo_par_id_canal_id_video;
+        : abrir_arquivo_id_canal;
+        if (abrir_arquivo_par_id_canal_id_video in gravar_id_canal_brasileiro) then (Sim)
+            : consultar_id_video;
+            : gravar_dados_video;
+        else (Não);
+            end;
+        endif; 
+    }
+    partition "**processo** spark_transformacao_dados_canais" {
+        : Fazer tratamento id _canais;
+    }
+
+    partition "**processo** spark_transformacao_dados_videos" {
+        : Fazer tratamento dados vídeos;
+    }
+
+    partition "**processo** copiar para o docker" {
+        : Copiar arquivos para o docker;
+    }
+
+    partition "**processo** Salvar banco de dados" {
+        : Salvar banco de dados no apache hive;
+    }
+
+
+stop
+@enduml
