@@ -24,7 +24,7 @@ start
     partition "**processo** task_youtubee_api_videos" {
         : abrir_arquivo_par_id_canal_id_video;
         : abrir_arquivo_id_canal;
-        if (abrir_arquivo_par_id_canal_id_video in gravar_id_canal_brasileiro) then (Sim)
+        if (abrir_arquivo_par_id_canal_id_video == gravar_id_canal_brasileiro) then (Sim)
             : consultar_id_video;
             : gravar_dados_video;
         else (Não);
